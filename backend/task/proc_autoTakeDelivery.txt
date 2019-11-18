@@ -1,0 +1,18 @@
+USE ichibanv2;
+DROP PROCEDURE IF EXISTS proc_autoTakeDelivery;
+
+DELIMITER $$
+#发货七天(86400*7=604800)后用户未确认收货将被自动设置为已收货
+CREATE PROCEDURE proc_autoTakeDelivery()
+BEGIN
+  DECLARE orders_id INT;
+  DECLARE fig INT DEFAULT 0;
+  DECLARE sql_cur CURSOR FOR SELECT id FROM ims_shopping_order WHERE cancelgoods=0 AND accomplish=0 AND status=2 AND sendexpress<UNIX_TIMESTAMP()-604800;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET fig=1;
+  OPEN sql_cur;
+  REPEAT
+     FETCH sql_cur INTO orders_id;
+     update ims_shopping_order set status=4,receipttime=TIMESTAMP WHERE cancelgoods=0 AND accomplish=0;
+  UNTIL fig END REPEAT;
+  CLOSE sql_cur;
+END $$

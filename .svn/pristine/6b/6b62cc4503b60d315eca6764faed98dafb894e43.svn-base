@@ -1,0 +1,8 @@
+<?php
+return [
+    'adminEmail' => 'admin@example.com',
+
+    'RpcServiceUri' => 'http://mall.troto.com.cn/rpc/index',
+
+    'FROMAT_JSON'    => \yii\web\Response::FORMAT_JSON,
+];

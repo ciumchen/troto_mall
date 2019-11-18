@@ -1,0 +1,227 @@
+{php $newUI = true;}
+{template 'common/header'}
+<style>
+.table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td{white-space:nowrap;}
+</style>
+<ul class="nav nav-tabs">
+	<li {if $do == 'display'}class="active"{/if}>
+		<a href="{php echo url('mc/sign/display');}">会员签到概述</a>
+	</li>
+	<li {if $do == 'record'}class="active"{/if}>
+		<a href="{php echo url('mc/sign/record');}">会员签到详细</a>
+	</li>
+	<li {if $do == 'exchange'}class="active"{/if}>
+		<a href="{php echo url('mc/sign/exchange');}">签到兑换记录</a>
+	</li>
+	<li>
+		<a href="{php echo url('site/entry/SigninGoods', array('op' => 'display', 'm' => 'ewei_shopping'))}">签到产品</a>
+	</li>
+</ul>
+{if $do == 'display'}
+<div class="clearfix">
+	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-horizontal" role="form">
+				<input type="hidden" name="c" value="mc" />
+				<input type="hidden" name="a" value="sign" />
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">昵称</label>
+					<div class="col-sm-9 col-md-8 col-lg-8 col-xs-12">
+						<input type="text" class="form-control" name="nickname" value="{$_GPC['nickname']}"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">用户ID</label>
+					<div class="col-sm-9 col-md-8 col-lg-8 col-xs-12">
+						<input type="text" class="form-control" name="uid" value="{$_GPC['uid']}"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="pull-right col-xs-12 col-sm-3 col-md-2 col-lg-2">
+						<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<form action="?{$_SERVER['QUERY_STRING']}" method="post" id="form1">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				会员签到基本信息 （当前搜索到 <label class="text text-danger">{$res['total']}</label> 条数据）
+			</div>
+			<div class="panel-body table-responsive" ng-controller="advAPI">
+				<table class="table table-hover"  style="width:100%;z-index:-10;" cellspacing="0" cellpadding="0">
+					<thead class="navbar-inner">
+						<tr>
+							<th>UID</th>
+							<th>昵称</th>
+							<th>现有次数</th>
+							<th>总签到次数</th>
+							<th>第一次签到</th>
+							<th>上次签到时间</th>
+							<th>兑换次数</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						{loop $res['list'] $item}
+						<tr>
+							<td>{$item['uid']}</td>
+							<td>{$item['nickname']}</td>
+							<td>{$item['times']}</td>
+							<td>{$item['counttimes']}</td>
+							<td>{php echo date('Y-m-d H:i:s',$item['createtime'])}</td>
+							<td>{php echo date('Y-m-d H:i:s',$item['lasttime'])}</td>
+							<td>{$item['exchangetimes']}</td>
+							<td>
+								<a href="{php echo url('mc/sign/record', array('uid'=>$item['uid']))}">签到详细</a>
+							</td>
+						</tr>
+						{/loop}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{$res['pager']}
+	</form>
+</div>
+{else if $do == 'record'}
+<div class="clearfix">
+	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-horizontal" role="form">
+				<input type="hidden" name="c" value="mc" />
+				<input type="hidden" name="a" value="sign" />
+				<input type="hidden" name="do" value="record" />
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">昵称</label>
+					<div class="col-sm-9 col-md-8 col-lg-8 col-xs-12">
+						<input type="text" class="form-control" name="nickname" value="{$_GPC['nickname']}"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">用户ID</label>
+					<div class="col-sm-9 col-md-8 col-lg-8 col-xs-12">
+						<input type="text" class="form-control" name="uid" value="{$_GPC['uid']}"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="pull-right col-xs-12 col-sm-3 col-md-2 col-lg-2">
+						<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<form action="?{$_SERVER['QUERY_STRING']}" method="post" id="form1">
+		<div class="panel-heading">
+			签到详细 （当前搜索到 <label class="text text-danger">{$res['total']}</label> 条数据）
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-body table-responsive" ng-controller="advAPI">
+				<table class="table table-hover"  style="width:100%;z-index:-10;" cellspacing="0" cellpadding="0">
+					<thead class="navbar-inner">
+						<tr>
+							<th>UID</th>
+							<th>签到时间</th>
+							<th>签到IP</th>
+						</tr>
+					</thead>
+					<tbody>
+						{loop $res['list'] $item}
+						<tr>
+							<td>{$item['uid']}</td>
+							<td>{$item['signintime']}</td>
+							<td>{$item['signinip']}</td>
+						</tr>
+						{/loop}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{$res['pager']}
+	</form>
+</div>
+{else if $do == 'exchange'}
+<div class="clearfix">
+	<div class="panel panel-info">
+		<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-horizontal" role="form">
+				<input type="hidden" name="c" value="mc" />
+				<input type="hidden" name="a" value="sign" />
+				<input type="hidden" name="do" value="record" />
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">昵称</label>
+					<div class="col-sm-9 col-md-8 col-lg-8 col-xs-12">
+						<input type="text" class="form-control" name="nickname" value="{$_GPC['nickname']}"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">用户ID</label>
+					<div class="col-sm-9 col-md-8 col-lg-8 col-xs-12">
+						<input type="text" class="form-control" name="uid" value="{$_GPC['uid']}"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="pull-right col-xs-12 col-sm-3 col-md-2 col-lg-2">
+						<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<form action="?{$_SERVER['QUERY_STRING']}" method="post" id="form1">
+		<div class="panel-heading">
+			签到兑换记录 （当前搜索到 <label class="text text-danger">{$res['total']}</label> 条数据）
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-body table-responsive" ng-controller="advAPI">
+				<table class="table table-hover"  style="width:100%;z-index:-10;" cellspacing="0" cellpadding="0">
+					<thead class="navbar-inner">
+						<tr>
+							<th width=60>记录ID</th>
+							<th>昵称</th>
+							<th>兑换类型</th>
+							<th width=150>奖品</th>
+							<th>兑换券</th>
+							<th>领取数量</th>
+							<th>商品收货</th>
+							<th>商品发货</th>
+							<th>状态</th>
+							<th>兑换时间</th>
+						</tr>
+					</thead>
+					<tbody>
+						{loop $res['list'] $item}
+						<tr>
+							<td>{$item['uid']}</td>
+							<td>{$item['nickname']}</td>
+							<td>{php echo ($item['exchangetype'] ==1)?'产品奖励':'兑换券';}</td>
+							<td>{$item['awardtitle']}</td>
+							<td>{$item['awardvalue']}</td>
+							<td>{$item['getnum']}</td>
+							<td>
+								{if $item['addrid'] == 0 && $item['status']==0}
+								尚未选择地址
+								{else if $item['addrid'] != 0}
+								<a href="{php echo url('mc/member/address', array('addrid'=>$item['addrid']))}">点击查看发货地址</a>
+								{/if}
+							</td>
+							<td>{$item['expresssn']}</td>
+							<td>{php echo ($item['status']==1)?'正常':'尚未选择地址';}</td>
+							<td>{php echo date('Y-m-d H:i:s', $item['createtime'])}</td>
+						</tr>
+						{/loop}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{$res['pager']}
+	</form>
+</div>
+{/if}
+
+{template 'common/footer'}

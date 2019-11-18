@@ -1,0 +1,472 @@
+{php $newUI = true;}
+
+{template 'common/header'}
+
+<style>
+    .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+        white-space: nowrap;
+    }
+</style>
+
+<ul class="nav nav-tabs">
+    <li {if $do=='display'}class="active"{/if}>
+        <a href="{php echo url('mc/huiyuan/display');}">会员运营</a>
+    </li>
+</ul>
+
+{if $do=='display'}
+<div class="clearfix">
+    <div class="panel panel-info">
+        <div class="panel-heading">筛选</div>
+        <div class="panel-body">
+            <form action="./index.php" method="get" class="form-horizontal order-horizontal" role="form" id="form0">
+                <input type="hidden" name="c" value="mc"/>
+                <input type="hidden" name="a" value="huiyuan"/>
+                <input type="hidden" name="acid" value="16"/>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">昵称</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+                        <input type="text" class="form-control" name="nickname" value="{$nickname}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">用户ID</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+                        <input type="text" class="form-control" name="uid" value="{$uid}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">注册时间</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+                    {php echo tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d', $ret['param']['starttime']),'endtime'=>date('Y-m-d', $ret['param']['endtime'])));}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">角色类型</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+                        <select name="saleType" class="form-control">
+                            <option value="">全部</option>
+                            <option value="0" {if isset($_GPC['saleType']) && $_GPC['saleType'] != '' && $_GPC['saleType'] == 0} selected="selected" {/if}>普通用户</option>
+                            <option value="1" {if isset($_GPC['saleType']) && $_GPC['saleType'] != '' && $_GPC['saleType'] == 1} selected="selected" {/if}>代理商</option>
+                            <option value="2" {if isset($_GPC['saleType']) && $_GPC['saleType'] != '' && $_GPC['saleType'] == 2} selected="selected" {/if}>分销商</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">性别</label>
+                    <div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+                        <select name="gender" class="form-control">
+                            <option value="">不限</option>
+                            <option value="0" {if isset($_GPC['gender']) && $_GPC['gender'] != '' && $_GPC['gender'] == 0} selected="selected" {/if}>未知</option>
+                            <option value="1" {if isset($_GPC['gender']) && $_GPC['gender'] != '' && $_GPC['gender'] == 1} selected="selected" {/if}>男</option>
+                            <option value="2" {if isset($_GPC['gender']) && $_GPC['gender'] != '' && $_GPC['gender'] == 2} selected="selected" {/if}>女</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="pull-right col-xs-12 col-sm-3 col-md-2 col-lg-2">
+                        <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="hidden" name='fansuid' value='{$fansuid}'>
+                    <input type="hidden" name='level' value='{$level}'>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script type="text/javascript">
+require(['daterangepicker'], function($){
+    $('.daterange').on('apply.daterangepicker', function(ev, picker) {
+        $('#form0')[0].submit();
+    });
+});
+</script>
+    {if $master}
+    <div class="panel panel-default row">
+        <div class="panel-body">
+            <div class="col-sm-5">
+                <p>大东家： <strong>{$master['nickname']}</strong></p>
+                <p>合伙人：<strong>{php echo (int)$total}个</strong></p>
+                <p>手机：<strong>{php echo $master['mobile']}</strong></p>
+            </div>
+            <div class="col-sm-4">
+                <p>加入时间：<strong>{php echo date('Y-m-d H:i:s',$master['joindate'])}</strong></p>
+                <p>关注时间：<strong>{php echo date('Y-m-d H:i:s',$master['followtime'])}</strong></p>
+                <p>取关时间：<strong>{php echo $master['unfollowtime']>1 ?date('Y-m-d H:i:s',$master['unfollowtime']):'未取关'}</strong></p>
+            </div>
+        </div>
+    </div>
+    {/if}
+
+    <form action="?{$_SERVER['QUERY_STRING']}" method="post" id="form1">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {if $level == 1}一级{else if $level == 2}二级{else if $level == 3}三级{/if}
+                会员（当前搜索到 <label class="text text-danger">{$total}</label> 条数据）
+            </div>
+
+            <div class="panel-body table-responsive" ng-controller="advAPI">
+                <table class="table table-hover" style="width:100%;z-index:-10;" cellspacing="0" cellpadding="0">
+                    <thead class="navbar-inner">
+                        <tr>
+                            <th width=35>删？</th>
+                            <th width=60>头像</th>
+                            <th width=220>昵称</th>
+                            <th width=50>性别</th>
+                            <th width=150>注册时间</th>
+                            <th width=90>是否关注</th>
+                            <th width=150>关注(取关)时间</th>
+                            <th width=200>分销类型</th>
+                            <th width=160>海淘家族</th>
+                            <th class="text-right;width:230px">操作</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {loop $list $item}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="delete[]" value="{$item['fanid']}"/>
+                        </td>
+
+                        <td>
+                            <img src="{if strexists($item['avatar'], 'http://') && strexists($item['avatar'], 'images')}{php echo tomedia($item['avatar']);}{elseif !empty($item['avatar'])}{php echo tomedia($item['avatar']);}{else}resource/images/noavatar_middle.gif{/if}"
+                                 onerror="this.src='resource/images/noavatar_middle.gif'" width="48">
+                        </td>
+                        <td>
+                            {if empty($item['uid'])}
+                            <a href="{php echo url('mc/member/post', array('uid' => $item['uid'],'openid' => $item['openid'], 'fanid' => $item['fanid']));}"
+                               class="text-danger" title="该用户尚未注册会员，请为其手动注册！">[ 注册为会员 ]</a>
+                            {/if}
+
+                            <a href="{php echo url('mc/member/post', array('uid'=>$item['uid']));}"><span>{$item['user']}</span></a>
+                        </td>
+                        <td>
+                            {if $item['gender']=='1'}<i class="fa fa-male"></i>
+                            {elseif $item['gender']=='2'}<i class="fa fa-female"></i>
+                            {else}<i class="fa fa-genderless"></i>{/if}
+                        </td>
+                        <td>
+                            {if $item['follow'] == '1' && $item['followtime'] <> '0'}
+                                {php echo date('Y-m-d H:i', $item['joindate'])}
+                            {else}
+                                {php echo date('Y-m-d H:i', $item['joindate'])}
+                            {/if}
+                        </td>
+
+                        <td>
+                            <a class="styleIsNone" href="{php echo url('mc/operations/insertUser', array('pid' => $item['uid'],'page'=>$_GPC['page']));}">
+                                {if isset($item['follow']) && $item['follow'] == '1'}
+                                    <span class="label label-success">已关注 </span>
+                                {else}
+                                    <span class="label label-danger">未关注 </span>
+                                {/if}
+                            </a>
+                        </td>
+                        <td>
+                            {if $item['follow']}{php echo date('Y-m-d H:i', $item['followtime'])}
+                            {elseif  $item['unfollowtime']}{php echo date('Y-m-d H:i', $item['unfollowtime'])}
+                            {else}&nbsp;{/if}
+                        </td>
+                        <td>
+                            <b><span class="{if $item['brokerid'] === null}text-danger{else}text-default{/if}">
+                                {if $item['brokerid'] === null}
+                                代理商
+                                {else}
+                                分销商
+                                    {if $item['brokerid'] === '0'}
+                                        (无上级)
+                                    {else}
+                                        <br>(上级UID {$item['brokerid']})
+                                    {/if}
+                                {/if}
+						</span></b>
+                        </td>
+                        <td>
+                            <a href="{php echo url('mc/huiyuan/', array('fansuid'=>$item['uid'],'level'=>1));}">一代</a>&nbsp;&nbsp;
+                            <a href="{php echo url('mc/huiyuan/', array('fansuid'=>$item['uid'],'level'=>2));}">二代</a>&nbsp;&nbsp;
+                            <a href="{php echo url('mc/huiyuan/', array('fansuid'=>$item['uid'],'level'=>3));}">三代</a>
+                        </td>
+                        <td style="overflow:visible;">
+                            <a class="btn btn-success btn-sm sms"
+                               href="{php echo url('site/entry/operations', array('uid'=>$item['uid'],'m'=>'ewei_shopping','op'=>'inserOrder','page'=>$_GPC['page']));}">
+                                手工订单
+                            </a>
+                            <a href="{php echo url('mc/notice/tpl', array('id' => $item['fanid']));}" id="{$item['fanid']}" class="btn btn-success btn-sm sms">发送消息</a>
+                            {if $_W['user']['power'] & ADMINISTRATOR}
+                            <a class="btn btn-success btn-sm" href="{php echo url('mc/huiyuan/cancelParent', array('uid' => $item['uid']));}">删除上家</a>
+                            <a class="btn btn-success btn-sm add-parent" data-uid="{$item['uid']}">添加上家</a>
+                            {/if}
+                            <a class="btn btn-success btn-sm sms"
+                               onclick="broker_type_form({$item['uid']}, '{$item['brokerid']}');">
+                                分销类型
+                            </a>
+                        </td>
+                    </tr>
+                    {/loop}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {$pager}
+    </form>
+</div>
+
+<div class="wx-info-box">
+    <h3>请输入上家的用户ID</h3>
+    <button aria-hidden="true" data-dismiss="modal" class="close wx-info-close" type="button">×</button>
+    <form action="{php echo url('mc/huiyuan/addparent');}" method="post" class="form-horizontal order-horizontal" role="form" id="form1">
+        <p>
+            <label class="control-label">用户ID：</label>
+            <input type="text" class="form-control parend-id-txt" name="parentid" value=""/>
+            <input type="hidden" name="userid" class="parent-id" value="0"/>
+        </p>
+        <p>
+            <button type="submit" class="btn btn-primary submit-parent" name="wechatsend" value="yes">添加</button>
+        </p>
+    </form>
+</div>
+
+<div class="modal fade" id="broker-type-form" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">分销商类型</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                <input type="hidden" id="uid" value="0">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">分销商类型</label>
+                    <div class="col-sm-9">
+                        <label class="radio-inline">
+                            <input type="radio" name="parent-broker" value="null"> 代理商
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="parent-broker" value="0"> 分销商
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">上级ID</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="parent-broker-id" value="0" placeholder="上级ID">
+                    </div>
+                </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="broker_type_save();">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('input[name=parent-broker]').change(function(){
+        var type = $(this).val();
+        var id_input = $('#parent-broker-id').parent().parent();
+
+        if (type ==='null') {
+            id_input.hide();
+        } else {
+            id_input.show();
+        }
+    });
+
+    function broker_type_form(uid, brokerid) {
+        $('#uid').val(uid);
+        $('#parent-broker-id').val(brokerid);
+
+        if (brokerid === '') {
+            $('input[name=parent-broker][value=null]').click();
+        } else {
+            $('input[name=parent-broker][value=0]').click();
+        }
+
+        $('#broker-type-form').modal();
+    }
+
+    function broker_type_save() {
+        $('#broker-type-form').modal('hide');
+
+        var type = $('input[name=parent-broker]:checked').val();
+        var brokerid = $('#parent-broker-id').val();
+
+        if (type === 'null') {
+            brokerid = 'null';
+        }
+
+        $.post('{php echo url("mc/huiyuan/updateParentBroker");}', {
+            uid: $('#uid').val(),
+            brokerid: brokerid
+        }, function (result) {
+            window.location.href = result.redirect;
+        }, 'json');
+    }
+
+    $('.btn, .title').hover(function () {
+        $(this).tooltip('show');
+    }, function () {
+        $(this).tooltip('hide');
+    });
+
+    require(['util', 'jquery'], function (u, $) {
+        $('.groupedit').click(function () {
+            var acid = $(this).attr('data-acid');
+            var groupid = $(this).attr('data-groupid');
+            var openid = $(this).attr('data-openid');
+            var fanid = $(this).attr('data-fanid');
+            var groupname = $(this).html();
+            if (!acid) {
+                u.message('公众号id错误', '', 'error');
+            }
+            if (!openid) {
+                u.message('粉丝openid错误', '', 'error');
+            }
+            $.post('{php echo url("/mc/fans/updategroup");}', {'openid': openid, 'acid': acid, 'groupid': groupid}, function (data) {
+                var data = $.parseJSON(data);
+                if (data.status == 'error') {
+                    u.message(data.mess, '', 'error');
+                } else if (data.status == 'success') {
+                    $('#' + fanid + '-name').html(groupname);
+                }
+            });
+        });
+
+        // 添加上家功能函数
+        !function addParentFun() {
+            var $parId = $('.parent-id'),
+                    parId = 0;
+            // 显示内容弹出框
+            $('.add-parent').on('click', function (e) {
+                e.stopPropagation();
+                parId = $(this).attr('data-uid');
+                // 设置需要添加上家的ID
+                $parId.val(parId);
+                $('.wx-info-box').fadeIn(200);
+            });
+            // 关闭内容
+            $('.wx-info-close').on('click', function () {
+                boxHide();
+            });
+            // 提交数据验证
+            $('.submit-parent').on('click', function () {
+                if (parId != 0 && parId != '') {
+                    // 上家ID
+                    var parTxt = $('.parend-id-txt').val();
+                    if (parTxt == '') {
+                        alert('请输入上家的用户ID');
+                        return false;
+                    }
+                } else {
+                    alert('添加上家失败，请重新添加！');
+                    boxHide();
+                    return false;
+                }
+            });
+            function boxHide() {
+                $parId.val(0);
+                $('.wx-info-box').fadeOut(200);
+            }
+
+        }();
+
+        /*
+         //发送消息
+         $('.sms').click(function(){
+         var fanid = $(this).attr('id');
+         if(!fanid) {
+         u.message('粉丝id错误', '', 'error');
+         return;
+         }
+
+         $.get("{php echo url('mc/notice/fans')}&fanid=" + fanid, function(data){
+         var obj = u.dialog('发送客服消息', data, '');
+         obj.modal('show');
+         return;
+         });
+         });
+         */
+    });
+
+</script>
+<style type="text/css">
+    .styleIsNone {
+        color: #333;
+    }
+
+    .styleIsNone:-webkit-any-link {
+        text-decoration: none;
+    }
+</style>
+{/if}
+
+{if $do=='view'}
+<div class="form-horizontal form">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            粉丝详情
+        </div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">对应会员</label>
+                <div class="col-sm-10">
+                    <span class="help-block">{if empty($row['uid'])}{$row['user']}{else}<a href="{php echo url('mc/member/post', array('uid'=>$row['uid']));}">{$row['user']}</a>{/if}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">粉丝编号</label>
+                <div class="col-sm-10">
+                    <span class="help-block">{$row['openid']}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">所属公众号</label>
+                <div class="col-sm-10">
+                    <span class="help-block">{$row['account']}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">是否关注</label>
+                <div class="col-sm-10">
+                    <span class="help-block">
+                        {if $row['follow'] == '1'}
+                            <span class="label label-success">已订阅 </span>
+                        {else}
+                            <span class="label label-danger">未订阅 </span>
+                        {/if}
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">关注时间</label>
+                <div class="col-sm-10">
+                    <span class="help-block">{if $row['followtime'] <> '0'}  {php echo date('Y-m-d H:i:s', $row['followtime'])} {else} <span
+                            class="label label-danger">未记录 </span> {/if}</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label">购买数量</label>
+                <div class="col-sm-10">
+                    <span class="help-block">{$row['ordertotal']}</span>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                <div class="col-sm-10">
+                    <span class="help-block"><a href="javascript:history.go(-1);" class="btn btn-primary">返回</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/if}
+{template 'common/footer'}

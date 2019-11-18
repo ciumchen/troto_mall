@@ -1,0 +1,40 @@
+<?php
+define('YII_DEBUG', 1);
+defined('YII_ENV') or define('YII_ENV', 'prod');
+
+if (YII_DEBUG) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+}
+
+
+function printf_info($data) {
+    foreach ($data as $key => $value) {
+        echo "<font color='#f00;'>$key</font> : $value <br/>";
+    }
+}
+
+require(__DIR__ . '/../../vendor/autoload.php');
+require(__DIR__ . '/../../vendor/yiisoft/yii2/Yii.php');
+require(__DIR__ . '/../../common/config/bootstrap.php');
+require(__DIR__ . '/../config/bootstrap.php');
+
+$config = yii\helpers\ArrayHelper::merge(
+    require(__DIR__ . '/../../common/config/main.php'),
+    require(__DIR__ . '/../../common/config/main-local.php'),
+    require(__DIR__ . '/../config/main.php'),
+    require(__DIR__ . '/../config/main-local.php')
+);
+
+if (YII_DEBUG) {
+    // configuration adjustments for 'dev' environment  
+    $config['bootstrap'][] = 'debug';
+    $config['modules']['debug'] = 'yii\debug\Module';
+
+    $config['bootstrap'][] = 'gii';
+    $config['modules']['gii']['class'] = 'yii\gii\Module';
+    $config['modules']['gii']['allowedIPs'] = ['*'];
+}
+
+$application = new yii\web\Application($config);
+$application->run();

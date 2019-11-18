@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ZH-CN">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="keywords" content="产品详情" />
+	<meta name="description" content="十点一刻" />
+	<meta name="author" content="云吉(www.rikee.com)" />
+	<meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1; user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<meta content="telephone=no" name="format-detection" /> 
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta name="msapplication-tap-highlight" content="no">
+	<title>产品详情</title>
+	<link rel="stylesheet" href="../css/global.css">
+	<link rel="stylesheet" href="../css/main.css">
+	<link rel="stylesheet" href="../css/personal.css">
+    <link rel="stylesheet" href="../demo-files/demo.css">
+    <link rel="stylesheet" href="../css/swiper.min.css">
+    <link rel="stylesheet" href="../style.css">
+	<script type="text/javascript" src="../js/jquery.js"></script>	
+	<script type="text/javascript" src="../js/mediaelement-and-player.min.js"></script>	
+    <script type="text/javascript" src="../js/jquery-1.7.2.js"></script>
+</head>
+<body>
+<!-- banner -->
+<div class="swiper-container">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide"><img src="../images/banner01.jpg"></div>
+        <div class="swiper-slide"><img src="../images/banner02.jpg"></div>
+        <div class="swiper-slide"><img src="../images/banner03.jpg"></div>
+    </div>
+    <div class="swiper-pagination"></div>
+</div>
+
+<div class="recommend">
+	<ul>
+		<li><h1><a href="">MAYER保温杯</a></h1></li>
+		<li>我有一个传说中的保温杯，它可以装冷的东西也可以装热的东西，
+反正我都不会用它来装东西。</li>
+		<li>运费：￥0.00</li>
+		<li>税费：￥0.00</li>
+		<li>原价：￥200.00</li>
+		<li>￥188</li>
+	</ul>
+	
+	<ol>
+		<li><span></span>日本直购</li>
+		<li>品牌：MAYER</li>
+		<li>库存：24</li>
+	</ol>
+</div>
+
+<div class="referral">
+	<span></span>
+	<div class="refer"><h2>产品介绍</h2></div>
+</div>
+
+<div class="referbox">
+	<!-- 视频 -->
+	<div style="width:100%; overflow: hidden;">
+	<video class="mejs-wmp" width="100%"  src="http://www.100sucai.com/img/video/happyfit2.mp4" type="video/mp4" 
+		id="player1" poster="../images/1.jpg" 
+		controls="controls" preload="none"></video>
+	</div>
+
+	<div class="refertext">
+		产品详情页
+	</div>
+</div>
+<div class="referral">
+	<span></span>
+	<div class="refer"><h2>商品推荐</h2></div>
+</div>
+<div class="movable-box03" style="display: block; margin-bottom: 70px;" >
+	<div class="comm01" style="display: block; padding: 0 10px; margin-top: 6px;">
+		<ul class="wares">
+			<li class="li2">
+				<ul class="wares-ul">
+					<li><img src="../images/produce.jpg"></li>
+					<li><h3><span></span>MAYER超级保温杯</h3></li>
+					<li><h3>RMB 58</h3></li>
+					<li>查看详情<span class="icon-more2"></span></li>
+				</ul>
+			</li>
+			<li class="li2">
+				<ul class="wares-ul">
+					<li><img src="../images/produce.jpg"></li>
+					<li><h3><span></span>MAYER超级保温杯</h3></li>
+					<li><h3>RMB 58</h3></li>
+					<li>查看详情<span class="icon-more2"></span></li>
+				</ul>
+			</li>
+			<li class="li2">
+				<ul class="wares-ul">
+					<li><img src="../images/produce.jpg"></li>
+					<li><h3><span></span>MAYER超级保温杯</h3></li>
+					<li><h3>RMB 58</h3></li>
+					<li>查看详情<span class="icon-more2"></span></li>
+				</ul>
+			</li>
+			<li class="li2">
+				<ul class="wares-ul">
+					<li><img src="../images/produce.jpg"></li>
+					<li><h3><span></span>MAYER超级保温杯</h3></li>
+					<li><h3>RMB 58</h3></li>
+					<li>查看详情<span class="icon-more2"></span></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<!-- 底部图标 -->
+<div class="purchase">
+	<ul>
+		<li>
+			<ol id="purc-ol">
+				<li><a href="###"><span class="icon-Collection"></span>收藏</a></li>
+				<li><a href="###"><span class="icon-shopcar"></span>购物车<i href="##" id="data">3</i></a></li>
+			</ol>
+		</li>
+		<li><a href="###">加入购物车</a></li>
+		<li><a href="###">立即购买</a></li>
+	</ul>
+</div>
+
+<!--返回顶部开始-->
+<!-- <a id="gotop"></a> -->
+<script src="../js/commonality.js"></script>
+<script type="text/javascript">
+// 选项卡
+	$(function(){
+		$("#blush li").click(function(){
+			$(this).addClass("tabin").siblings().removeClass("tabin");
+			var index = $(this).index();
+			$(".nav-list").hide();
+			$(".nav-list").eq(index).show();
+		})
+	});
+</script>
+
+
+<!-- Swiper JS -->
+<script src="../js/swiper.min.js"></script>
+<!-- 幻灯片js -->
+<script>
+	var swiper = new Swiper('.swiper-container', {
+	    pagination: '.swiper-pagination',
+	    nextButton: '.swiper-button-next',
+	    prevButton: '.swiper-button-prev',
+	    paginationClickable: true,
+	    spaceBetween: 60,
+	    centeredSlides: true,
+	    autoplay: 3500,
+	    autoplayDisableOnInteraction: false
+	});
+
+	$('audio,video').mediaelementplayer({
+		success: function(player, node) {
+			$('#' + node.id + '-mode').html('mode: ' + player.pluginType);
+		}
+	});
+</script>
+</body>
+</html>

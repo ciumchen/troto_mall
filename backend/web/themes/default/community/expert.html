@@ -1,0 +1,186 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li {if $do == 'display'}class="active"{/if}>
+		<a href="{php echo url('community/expert/display', array('uid' => $uid));}">社区专家 列表</a>
+	</li>
+
+	<li {if $do == 'post'}class="active"{/if}>
+		<a href="{php echo url('community/expert/post', array('id' => $_GPC['id']));}">社区专家 {if $_GPC['id']}编辑{else}添加{/if}</a>
+	</li>
+	
+</ul>
+{if $do=='display'}
+<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal" role="form">
+		<input type="hidden" name="c" value="community">
+		<input type="hidden" name="a" value="expert">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">专家微信昵称</label>
+				<div class="col-sm-6 col-md-8 col-lg-8 col-xs-12">
+					<input type="text" class="form-control" name="expertname" class="" value="{$_GPC['expertname']}" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">社区群名</label>
+				<div class="col-sm-6 col-md-8 col-lg-8 col-xs-12">
+					<select class="form-control" style="margin-right:15px;" name="comgroupid" >
+						<option value="0">请选择归属社区</option>
+						{loop $group $row}
+							<option value="{$row['comgroupid']}" {if $row['comgroupid'] == $_GPC['comgroupid']} selected="selected"{/if}>{$row['groupname']}</option>
+						{/loop}
+					</select>
+				</div>
+				<div class="pull-right col-xs-12 col-sm-3 col-md-2 col-lg-2">
+					<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<form method="post" class="form-horizontal" id="form1">
+<div class="panel panel-default ">
+	<div class="panel-heading">
+		社区专家（当前搜索到 <label class="text text-danger">{$res['total']}</label> 条数据）
+	</div>
+	<div class="table-responsive panel-body">
+	<table class="table table-hover">
+		<input type="hidden" name="do" value="del" />
+		<thead class="navbar-inner">
+			<tr>
+				<th style="width:44px;">删?</th>
+				<th style="width:80px;">编号</th>
+				<th style="width:80px;">头像图</th>
+				<th>社区群名</th>
+				<th>微信昵称</th>
+				<th>真实姓名</th>
+				<th>标签</th>
+				<th>专业</th>
+				<th>手机</th>
+				<th>注册时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		{loop $res['list'] $li}
+			<tr>
+				<td><input type="checkbox" name="expertid[]" value="{$li['expertid']}" class=""></td>
+				<td>{$li['expertid']}</td>
+				<td><img src="{if !empty($li['avatar'])}{php echo tomedia($li['avatar']);}{else}resource/images/nothumb_middle.gif{/if}" onerror="this.src='resource/images/nothumb_middle.gif'" width="50"></td>
+				<td title="{$li['groupname']}">{$li['groupname']}</td>
+				<td>{if $li['expertname']}{$li['expertname']}{else}未完善{/if}</td>
+				<td>{if $li['realname']}{$li['realname']}{else}未完善{/if}</td>
+				<td title="{$li['label']}">{if $li['label']}{$li['label']}{else}未完善{/if}</td>			
+				<td title="{$li['profession']}">{if $li['profession']}{$li['profession']}{else}未完善{/if}</td>
+				<td title="{$li['mobile']}">{if $li['mobile']}{$li['mobile']}{else}未完善{/if}</td>
+				<td>{php echo date('Y-m-d H:i',$li['jointime'])}</td>
+				<td><a href="{php echo url('community/expert/post',array('id' => $li['expertid']))}" data-toggle="tooltip" data-placement="top" title="编辑" class="btn btn-default btn-sm"><i class="fa fa-edit"></i></a></td>
+			</tr>
+		{/loop}
+		<tr>
+			<td><input type="checkbox" name="" onclick="var ck = this.checked;$(':checkbox').each(function(){this.checked = ck});"></td>
+			<input name="token" type="hidden" value="{$_W['token']}" />
+			<td colspan="10"><input type="submit" name="submit" class="btn btn-primary" value="删除"></td>
+		</tr>
+		</tbody>
+
+	</table>
+</div>
+</div>
+	{$res['pager']}
+</form>
+<script>
+require(['jquery', 'util'], function($, u){
+	$('#form1').submit(function(){
+		if($(":checkbox[name='expertid[]']:checked").size() > 0){
+			return confirm('删除后不可恢复，您确定删除吗？');
+		}
+		u.message('没有选择社群', '', 'error');
+		return false;
+	});
+	$('.btn').hover(function(){
+		$(this).tooltip('show');
+	},function(){
+		$(this).tooltip('hide');
+	});
+});
+</script>
+{/if}
+{if $do=='post'}
+<div class="main">
+<form action="" class="form-horizontal form" method="post" enctype="multipart/form-data">
+
+	<div class="panel panel-default">
+		<input type="hidden" name="id" value="{$_GPC['id']}" />
+		<div class="panel-heading">
+			基本资料
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">专家微信昵称</label>
+				<div class="col-sm-9 col-xs-12">
+					<input type="text" class="form-control" name="expertname" value="{$expert['expertname']}" placeholder="篮球教练">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">专业</label>
+				<div class="col-sm-9 col-xs-12">
+					<input type="text" class="form-control" name="profession" value="{$expert['profession']}" placeholder="篮球教练">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">真实姓名</label>
+				<div class="col-sm-9 col-xs-12">
+					<input type="text" class="form-control" name="realname" value="{$expert['realname']}" placeholder="科比">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">标签</label>
+				<div class="col-sm-9 col-xs-12">
+					<input type="text" class="form-control" name="label" value="{$expert['label']}" placeholder="如：健身达人 篮球达人。注:注意空格">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style='color:red'>*</span>归属社区</label>
+				<div class="col-sm-6 col-xs-6">
+					<select class="form-control" style="margin-right:15px;" name="comgroupid" >
+						<option value="0">请选择归属社区</option>
+						{loop $group $row}
+							<option value="{$row['comgroupid']}" {if $row['comgroupid'] == $expert['comgroupid']} selected="selected"{/if}>{$row['groupname']}</option>
+						{/loop}
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">头像</label>
+				<div class="col-sm-9 col-xs-12">
+					{php echo tpl_form_field_image('avatar', $expert['avatar'], '', array('extras' => array('text' => 'readonly')))}
+				</div>
+			</div>			
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">手机</label>
+				<div class="col-sm-9 col-xs-12">					
+					<input type="text" name="mobile" class="form-control" value="{$expert['mobile']}" placeholder="联系手机" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">介绍</label>
+				<div class="col-sm-9 col-xs-12">
+					<textarea style="height:150px;" class="form-control" name="content" cols="70">{$expert['content']}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+
+	<div class="form-group">
+		<div class="col-sm-12">
+			<button type="submit" class="btn btn-primary col-lg-1" name="submit" value="提交">提交</button>
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+	</div>
+</form>
+</div>
+{/if}
+{template 'common/footer'}

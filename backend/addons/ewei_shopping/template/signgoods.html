@@ -1,0 +1,182 @@
+{template 'common/header'}
+{template 'common'}
+{template 'operationsmenu'}
+<div class="main">
+{if $operation == 'display'}
+<p class="text-danger">
+	<a class="btn btn-success" href="{php echo $this->createWebUrl('SigninGoods', array('op' => 'handle'))}">添加签到奖励规则</a>
+</p>
+<div class="panel-body table-responsive">
+	<table class="table table-hover prize-list">
+		<thead class="navbar-inner">
+			<tr>
+				<th>活动类型</th>
+				<th>兑换类型</th>
+				<th>奖品名称</th>
+				<th>兑换券</th>
+				<th>兑换天数</th>
+				<th>可兑换</th>
+				<th>已兑换</th>
+				<th>创建时间</th>
+			</tr>
+		</thead>
+		{loop $list $item}
+		<tr>
+			<td>{php echo ($item['actiontype'] == 1 ) ? '签到':'';}</td>
+			<td>{php echo ($item['exchangetype'] == 1 ) ? '产品':'兑换券';}</td>
+			<td>{$item['awardtitle']}</td>
+			<td>{$item['awardvalue']} 元</td>
+			<td>{$item['exchangevalue']}</td>
+			<td>{php echo ($item['total'] == 0)? '无限': $item['total'];}</td>
+			<td>{$item['exchangetimes']}</td>
+			<td>{php echo date('Y-m-d H:i:s',$item['createtime']);}</td>
+		</tr>
+		{/loop}
+	</table>
+	{$pager}
+</div>
+{/if}
+{if $operation == 'handle'}
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="form1">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				奖品添加
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">活动类型</label>
+					<div class="col-sm-9 col-xs-12">
+						<select id="common_corp" class="form-control input-medium prize-act-type">
+							<option value="1" {if $activitygoods['actiontype'] == 1}checked{/if}>签到</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">兑换类型</label>
+					<div class="col-sm-9 col-xs-12">
+						<select id="common_corp1" class="form-control input-medium prize-type" name="type">
+							<option value="1" {if $activitygoods['exchangetype'] == 1}checked{/if}>产品</option>
+							<option value="2" {if $activitygoods['exchangetype'] == 2}checked{/if}>兑换券</option>
+						</select>
+					</div>
+				</div>
+				<div class="prize-set">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">兑换规则</label>
+						<div class="col-sm-9 col-xs-12">
+							<span>签到天数：<input type="text" class="form-control reg-num" name="regNum" /></span>
+							<span>领取次数：<input type="text" class="form-control reg-fre" name="regFre" /></span>
+							<span class="product-type on">奖励产品(多选)：
+								<input type="text" class="form-control reg-pro" data-id="" name="regPro" />
+							</span>
+							<span class="coupon-type">
+								奖励券名：
+								<input type="text" class="form-control reg-coupon" name="regCouName" />
+								奖励金额：
+								<input type="text" class="form-control reg-coupon reg-coupon-money" name="regCouMoney" />
+							</span>
+							<div class="select-pro">
+								<ul>
+									{loop $goods $item}
+									<li data-id="{$item['id']}">
+										<img src="{$item['thumb']}"/><span>{$item['title']}</span></li>
+									{/loop}
+								</ul>
+								<a href="javascript:;" class="btn btn-default select-pro-btn">确 定</a>
+								<a href="javascript:;" class="select-refresh">换一换</a>
+							</div>
+							<a href="javascript:;" class="btn btn-default add-prize-rule" data-type="1">添加规则</a>
+						</div>
+						<div class="col-sm-9 col-xs-12">
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">上线</label>
+					<div class="col-sm-9 col-xs-12">
+						<label class='radio-inline'>
+							<input type='radio' name='enabled' value='1' {if $activitygoods['enabled']==1}checked{/if} /> 是
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' name='enabled' value='0' {if $activitygoods['enabled']==0}checked{/if} /> 否
+						</label>
+					</div>
+				</div>
+				<div class="prize-product on">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">规则列表</label>
+						<div class="col-sm-9 col-xs-12">
+							<table class="table table-hover product-table">
+								<tr>
+									<th width="120">签到天数</th>
+									<th width="120">领取次数</th>
+									<th>签到奖品</th>
+									<th width="120">删除</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="prize-coupon">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">规则列表</label>
+						<div class="col-sm-9 col-xs-12">
+							<table class="table table-hover coupon-table">
+								<tr>
+									<th width="120">签到天数</th>
+									<th width="120">领取次数</th>
+									<th>券名</th>
+									<th>金额</th>
+									<th width="120">删除</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group col-sm-12">
+			<input type="button" name="submit" value="提交" class="btn btn-primary col-lg-1 prize-submit" />
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+	</form>
+{/if}
+</div>
+<script>
+	require(['bootstrap'],function($){
+		$('.btn').hover(function(){
+			$(this).tooltip('show');
+		},function(){
+			$(this).tooltip('hide');
+		});		
+	});
+</script>
+<script type="text/javascript" src="resource/js/app/prize-settings.js"></script>
+<script type="text/javascript">
+	$(function() {
+		// 实例化奖品设置
+		new PrizeSettings({
+			pType: $('.prize-type'),
+			pActType: $('.prize-act-type'),
+			pPro: $('.prize-product'),
+			pCou: $('.prize-coupon'),
+			ruleBtn: $('.add-prize-rule'),	
+			regNum: $('.reg-num'),
+			regFre: $('.reg-fre'),
+			regPro: $('.reg-pro'),				
+			selPro: $('.select-pro'),			
+			selBtn: $('.select-pro-btn'),
+			proTable: $('.product-table'),
+			couTable: $('.coupon-table'),
+			refresh: $('.select-refresh'),
+			proType: $('.product-type'),
+			couType: $('.coupon-type'),
+			prizeBtn: $('.prize-submit'),
+			enabled: 'enabled',
+			getProURL: "{php echo $this->createWebUrl('ApiSigninGoods')}",
+			submitURL: location.href,
+			on: 'on'
+		});
+	});
+</script>
+{template 'common/footer'}

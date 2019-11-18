@@ -1,0 +1,114 @@
+<?php
+    namespace comapi\controllers;
+    use Yii;
+    use yii\db\Exception;
+    use yii\web\Controller;
+
+    class MaintenanceController extends Controller
+    {
+        private $rpc;
+        private $fromatJson;
+
+        public function init() {
+            parent::init();
+            $this->enableCsrfValidation = false;
+
+            $this->fromatJson = yii::$app->params['FROMAT_JSON'];
+
+            $this->rpc = new \Yar_Client(Yii::$app->params['RpcServiceUri'].'?maintenance');
+            $this->rpc->SetOpt(YAR_OPT_CONNECT_TIMEOUT, 3000);
+            $this->rpc->SetOpt(YAR_OPT_TIMEOUT, 0);
+        }
+
+        /*
+         * 补货开门
+         * @param int phone 手机号
+         * @param int password 密码
+         * */
+        public function actionVerify() {
+            Yii::$app->response->format = $this->fromatJson;;
+            $resp = [
+                'code' => '4003',
+                'msg'  => 'Request Invalid',
+                'data' => []
+            ];
+            $phone = yii::$app->request->post('phone');
+            $password = yii::$app->request->post('password');
+            // var_dump($phone, $password);die;
+            if(is_numeric($phone) && is_numeric($password)) {
+                try {
+                    $data= $this->rpc->verify($phone, $password);
+                    $resp['code'] = 2000;
+                    $resp['msg'] = 'ok';
+                    $resp['data'] = $data;
+                } catch (Exception $e)
+                {
+                    $resp['code'] = 5001;
+                    $resp['msg'] = $e->getMessage();
+                }
+            }
+
+            return $resp;
+        }
+
+        /*
+         * 补货查询
+         * @param int phone 手机号码
+         * */
+        public function actionReplenish() {
+            Yii::$app->response->format = $this->fromatJson;;
+            $resp = [
+                'code' => '4003',
+                'msg'  => 'Request Invalid',
+                'data' => []
+            ];
+            $phone = yii::$app->request->post('phone');
+            // var_dump($phone, $password);die;
+            if($phone && is_numeric($phone)) {
+                try {
+                    $data = $this->rpc->replenish($phone);
+                    $resp['code'] = 2000;
+                    $resp['msg'] = 'ok';
+                    $resp['data'] = $data;
+                } catch (Exception $e)
+                {
+                    $resp['code'] = 5001;
+                    $resp['msg'] = $e->getMessage();
+                }
+            }
+
+            return $resp;
+        }
+
+        /*
+         * 补货结果
+         * @param string
+         * */
+        public function actionSubreplenish() {
+            Yii::$app->response->format = $this->fromatJson;;
+            $resp = [
+                'code' => '4003',
+                'msg'  => 'Request Invalid',
+                'data' => []
+            ];
+
+            $data = yii::$app->request->post('data');
+            // $replenishsn = yii::$app->request->post('replenishsn');
+            // $tyres = yii::$app->request->post('tyres');
+            // var_dump($tyres);die;
+            if(is_string($data)) {
+                try {
+                    $data = $this->rpc->subreplenish($data);
+                    $resp['code'] = 2000;
+                    $resp['msg'] = 'ok';
+                    $resp['data'] = $data;
+                } catch (Exception $e)
+                {
+                    $resp['code'] = 5001;
+                    $resp['msg'] = $e->getMessage();
+                }
+            }
+
+            return $resp;
+        }
+    }

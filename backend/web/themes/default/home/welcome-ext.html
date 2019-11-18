@@ -1,0 +1,350 @@
+{if $moudles}
+{if $enable_modules && ($_W['user']['power'] & ADMINISTRATOR)}
+<div class="page-header">
+	<h4><i class="fa fa-cubes"></i> 已启用的模块</h4>
+</div>
+<div class="panel panel-default row">
+	<div class="table-responsive panel-body">
+	<table class="table">
+		<tr>
+			<th style="width:10%"></th>
+			<th style="width:15%">模块名称</th>
+			<th style="width:10%;">标识</th>
+			<th style="width:40%">描述</th>
+		</tr>
+		{loop $enable_modules $key $row}
+		<tr>
+			<td>
+				{if file_exists($buildinpath.$key.'/icon.jpg')}
+				<img alt="{$row['title']}" src="../framework/builtin/{$key}/icon.jpg" class="img-rounded">
+				{elseif file_exists($path.$key.'/icon.jpg')}
+				<img alt="{$row['title']}" src="../addons/{$key}/icon.jpg" width="48" height="48" class="img-rounded">
+				{else}
+				<img alt="{$row['title']}" src="./resource/images/nopic-small.jpg" width="48" height="48" class="img-rounded">
+				{/if}
+			</td>
+			<td>
+				{$row['title']}
+				{if $row['official']}
+				<i class="official"><img src="resource/images/module/official.png"/></i>
+				{/if}
+			</td>
+			<td>
+				{$row['name']}
+			</td>
+			<td>
+				{$row['ability']}
+			</td>
+			<td>
+				
+			</td>
+		</tr>
+		{/loop}
+	</table>
+</div>
+</div>
+{/if}
+{if $unenable_modules && ($_W['user']['power'] & ADMINISTRATOR)}
+<div class="page-header">
+	<h4><i class="fa fa-cubes"></i> 未启用的模块</h4>
+</div>
+<div class="panel panel-default row">
+	<div class="table-responsive panel-body">
+	<table class="table">
+		<tr>
+			<th style="width:10%"></th>
+			<th style="width:15%">模块名称</th>
+			<th style="width:10%;">标识</th>
+			<th style="width:40%">描述</th>
+			<th>
+				
+			</th>
+		</tr>
+		{loop $unenable_modules $key $row}
+		<tr>
+			<td>
+				{if file_exists($path.$key.'/icon.jpg')}
+				<img alt="{$row['title']}" src="../addons/{$key}/icon.jpg" width="48" height="48" class="img-rounded">
+				{else}
+				<img alt="{$row['title']}" src="./resource/images/nopic-small.jpg" width="48" height="48" class="img-rounded">
+				{/if}
+			</td>
+			<td>
+				{$row['title']}
+				{if $row['official']}
+				<i class="official"><img src="resource/images/module/official.png"/></i>
+				{/if}
+			</td>
+			<td>
+				{$row['name']}
+			</td>
+			<td>
+				{$row['ability']}
+			</td>
+			<td>
+				&nbsp;
+			</td>
+		</tr>
+		{/loop}
+	</table>
+	</div>
+</div>
+
+{/if}
+{else}
+<!--
+	{if $_W['user']['power'] & PRODUCT && !($_W['user']['power'] & ORDER) || $_W['user']['power'] & ADMINISTRATOR}
+	<div class="page-header">
+		<h4><i class="fa fa-plane"></i> 核心功能设置</h4>
+	</div>
+	
+	<div class="shortcut clearfix">
+		{if $entries['cover']}
+			{loop $entries['cover'] $cover}
+			<a href="{$cover['url']}" title="{$cover['title']}">
+				<i class="fa fa-external-link-square"></i>
+				<span>{$cover['title']}</span>
+			</a>
+			{/loop}
+		{/if}
+		{if $module['isrulefields']}
+			<a href="{php echo url('platform/reply', array('m' => $m))}">
+				<i class="fa fa-comments"></i>
+				<span>回复规则列表</span>
+			</a>
+		{/if}
+		{if $entries['home'] || $entries['profile'] || $entries['shortcut']}
+			{if $entries['home']}
+				<a href="{php echo url('site/nav/home', array('m' => $m))}">
+					<i class="fa fa-home"></i>
+					<span>微站首页导航</span>
+				</a>
+			{/if}
+			{if $entries['profile']}
+				<a href="{php echo url('site/nav/profile', array('m' => $m))}">
+					<i class="fa fa-user"></i>
+					<span>个人中心导航</span>
+				</a>
+			{/if}
+			{if $entries['shortcut']}
+				<a href="{php echo url('site/nav/shortcut', array('m' => $m))}">
+					<i class="fa fa-plane"></i>
+					<span>快捷菜单</span>
+				</a>
+			{/if}
+		{/if}
+		{if $module['settings']}
+			<a href="{url 'profile/module/setting' array('m' => $m)}">
+				<i class="fa fa-cog"></i>
+				<span title="参数设置">参数设置</span>
+			</a>
+		{/if}
+	</div>
+	{/if}
+	{if empty($module['issolution'])}
+	{if $entries['menu']}
+		<div class="page-header">
+			<h4><i class="fa fa-plane"></i> 业务功能菜单</h4>
+		</div>
+		<div class="shortcut clearfix">
+			{if $_W['user']['power'] & FINANCE}
+			<a href="{url 'ma/manager/exchange'}">
+				<i class="fa fa-puzzle-piece"></i>
+				<span>佣金兑换管理</span>
+			</a>
+			{/if}
+			{if $_W['user']['power'] & PRODUCT}
+			{loop $entries['menu'] $menu}
+				{if ($_W['user']['power'] & ADMINISTRATOR)}
+					<a href="{$menu['url']}" title="{$menu['title']}">
+						<i class="fa fa-puzzle-piece"></i>
+						<span>{$menu['title']}</span>
+					</a>
+				{else if $_W['user']['power'] & PRODUCT && ($_W['user']['power'] & ORDER)}
+					{if $menu['title'] == '订单管理'}
+					<a href="{$menu['url']}" title="{$menu['title']}">
+						<i class="fa fa-puzzle-piece"></i>
+						<span>{$menu['title']}</span>
+					</a>
+					{/if}
+				{else}
+					{if $_W['user']['power'] & PRODUCT && !($_W['user']['power'] & ORDER)}
+					<a href="{$menu['url']}" title="{$menu['title']}">
+						<i class="fa fa-puzzle-piece"></i>
+						<span>{$menu['title']}</span>
+					</a>
+					{/if}
+				{/if}
+			{/loop}
+			{/if}
+		</div>
+	{/if}
+	{else}
+		<div class="page-header">
+			<h4><i class="fa fa-plane"></i> 功能分权 (仅限行业模块)</h4>
+		</div>
+		<div class="shortcut clearfix">
+			<a href="{url 'profile/worker' array('m' => $m, 'reference' => 'solution')}">
+				<i class="fa fa-users"></i>
+				<span>设置操作用户</span>
+			</a>
+			<a href="{url 'home/welcome/solution' array('m' => $m)}">
+				<i class="fa fa-cogs"></i>
+				<span>进入管理后台</span>
+			</a>
+		</div>
+	{/if}
+-->
+{/if}
+{if ($_W['user']['power'] & PRODUCT || $_W['user']['power'] & ADMINISTRATOR || $_W['user']['power'] & FINANCE)}
+<div class="page-header">
+	<h4><i class="fa fa-money"></i> 商城功能</h4>
+</div>
+<div class="shortcut clearfix">
+	<a href="{php echo url('site/entry/order', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-strikethrough"></i>
+		<span>订单管理</span>
+	</a>
+	<a href="{php echo url('site/entry/goods', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-puzzle-piece"></i>
+		<span>商品管理</span>
+	</a>
+	<a href="{php echo url('site/entry/category', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-share-alt"></i>
+		<span>商品分类管理</span>
+	</a>
+	<a href="{php echo url('shopping/topic', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-paper-plane-o"></i>
+		<span>销售专题管理</span>
+	</a>
+	<a href="{php echo url('shopping/ads', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-diamond"></i>
+		<span>广告幻灯片管理</span>
+	</a>
+	<!-- <a href="{php echo url('ma/finance/display',array('type'=>'order'))}">
+		<i class="fa fa-puzzle-piece"></i>
+		<span>基础统计</span>
+	</a>
+	<a href="{php echo url('ma/finance/orderCount',array('status'=>'all'))}">
+		<i class="fa fa-puzzle-piece"></i>
+		<span>订单统计</span>
+	</a>
+	<a href="{php echo url('ma/finance/commCount',array('type'=>'all'))}">
+		<i class="fa fa-puzzle-piece"></i>
+		<span>佣金兑换统计</span>
+	</a>
+	<a href="{php echo url('ma/finance/incomeCount',array('type'=>'ok'))}">
+		<i class="fa fa-puzzle-piece"></i>
+		<span>收入统计</span>
+	</a> -->
+</div>
+<div class="page-header">
+	<h4><i class="fa fa-plane"></i> 运营及活动</h4>
+</div>
+<div class="shortcut clearfix">
+	<a href="{php echo url('profile/worker', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-user-plus"></i>
+		<span>操作人员列表</span>
+	</a>
+	<!-- <a href="{php echo url('ma/suppliers/suppliers')}">
+		<i class="fa fa-strikethrough"></i>
+		<span>佣金历史记录</span>
+	</a>
+	<a href="{php echo url('shopping/reward/manage', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-puzzle-piece"></i>
+		<span>佣金申请处理</span>
+	</a>-->
+	<a href="{php echo url('shopping/coupon/manage', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-gift"></i>
+		<span>优惠券管理</span>
+	</a>
+	<a href="{php echo url('shopping/coupon/type', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-gift"></i>
+		<span>优惠券类型</span>
+	</a>
+	<a href="{php echo url('shopping/redpacket/type', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-gift"></i>
+		<span>红包管理</span>
+	</a>
+	<a href="{php echo url('shopping/news/news', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-diamond"></i>
+		<span>新闻管理</span>
+	</a>
+	<!-- <a href="{php echo url('ma/suppliers/suppliers')}">
+		<i class="fa fa-strikethrough"></i>
+		<span>佣金历史记录</span>
+	</a>
+	<a href="{php echo url('shopping/reward/manage', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-puzzle-piece"></i>
+		<span>佣金申请处理</span>
+	</a> -->
+</div>
+<div class="page-header">
+	<h4><i class="fa fa-barcode"></i> 业务支撑配置</h4>
+</div>
+<div class="shortcut clearfix">
+	<a href="{php echo url('site/entry/branding', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-paragraph"></i>
+		<span>品牌管理</span>
+	</a>
+	<a href="{php echo url('ma/suppliers/suppliers')}">
+		<i class="fa fa-paragraph"></i>
+		<span>供应商管理</span>
+	</a>
+	<a href="{php echo url('site/entry/warehouse', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-paragraph"></i>
+		<span>仓库管理</span>
+	</a>
+	<!-- <a href="{php echo url('site/entry/express', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-paragraph"></i>
+		<span>物流管理</span>
+	</a>
+	<a href="{php echo url('site/entry/orderexpress', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-paragraph"></i>
+		<span>发货管理</span>
+	</a> -->
+	<a href="{php  echo url('site/entry/cabinet', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-paragraph"></i>
+		<span>货柜管理</span>
+	</a>
+
+	<a href="{php  echo url('site/entry/servicefee', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-paragraph"></i>
+		<span>服务费管理</span>
+	</a>
+	{if ($_W['user']['power'] & ADMINISTRATOR || $_W['user']['power'] & FINANCE)}
+	<a href="{php  echo url('site/entry/corpteam', array('m'=>'ewei_shopping'))}">
+		<i class="fa fa-paragraph"></i>
+		<span>主副卡管理</span>
+	</a>
+	{/if}
+</div>
+{/if}
+<script type="text/javascript">
+<!--
+{if $_W['isfounder']}
+	function checkupgradeModule() {
+		require(['util'], function(util) {
+			if (util.cookie.get('checkupgrade_{$m}')) {
+				return;
+			}
+			$.getJSON("{url 'utility/checkupgrade/module' array('m' => $m)}", function(ret){
+				if (ret && ret.message && ret.message.upgrade == '1') {
+					$('body').prepend('<div id="upgrade-tips-module" class="upgrade-tips"><a class="module" href="./index.php?c=cloud&a=upgrade&">【'+ret.message.name+'】检测到新版本'+ret.message.version+'，请尽快更新！</a><span class="tips-close" onclick="checkupgradeModule_hide()"><i class="fa fa-times-circle"></i></span></div>');
+					if ($('#upgrade-tips').size()) {
+						$('#upgrade-tips-module').css('top', '25px');
+					}
+				}
+			});
+		});
+	}
+	function checkupgradeModule_hide() {
+		require(['util'], function(util) {
+			util.cookie.set('checkupgrade_{$m}', 1, 3600);
+			$('#upgrade-tips-module').hide();
+		});
+	}
+	$(function(){// checkupgradeModule();});
+{/if}
+//-->
+</script>

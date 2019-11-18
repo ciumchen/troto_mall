@@ -1,0 +1,186 @@
+<?php
+namespace common\models;
+
+use Yii;
+use yii\db\Query;
+use yii\base\Model;
+
+use common\models\ShoppingOrderGoods;
+
+use frontend\models\ShoppingGoods;
+
+/**
+ * This is the model class for table "{{%shopping_order}}".
+ *
+ * @property int $id
+ * @property int $weid
+ * @property int $uid
+ * @property string $source 订单来源：WX-微信商城，BOX-机柜
+ * @property int $cabinetid
+ * @property string $from_user openid，null值表示临时单
+ * @property int $hassub_order 是否包含子订单，1为包含，0不包含
+ * @property string $parent_ordersn 指示父订单，空则无父订单。
+ * @property string $ordersn 订单号
+ * @property string $price 实付
+ * @property string $taxtotal 税费总额
+ * @property string $goodsprice 订单总价
+ * @property string $coupon 优惠券金额
+ * @property int $couponid 优惠券ID
+ * @property int $status -1取消订单,0未支付,1已付款,2已发货,3已收货,4已评价,5结束
+ * @property int $sendtype 1为快递，2为自提
+ * @property int $paytype 1为余额，2为在线，3为到付
+ * @property string $transid 支付单号（微信/易极付）
+ * @property int $goodstype
+ * @property string $remark
+ * @property int $addressid
+ * @property string $realname 收货人
+ * @property string $mobile 联系方式
+ * @property string $id_no 证件编号
+ * @property string $province 省
+ * @property string $city 市
+ * @property string $area 区
+ * @property string $address 详细地址
+ * @property string $express 快递编码
+ * @property string $expresscom 快递名称
+ * @property string $expresssn 快递单号
+ * @property int $sendexpress 发货时间
+ * @property string $dispatchprice
+ * @property int $dispatch
+ * @property int $send 购买上家通知
+ * @property int $createtime 创建时间
+ * @property int $cancelgoods 0正常1售后申请2完成
+ * @property int $receipttime 收货时间
+ * @property int $accomplish 0未完成1订单完成不操作
+ * @property int $paymenttime 付款时间
+ * @property int $pickcode_user 用户自助取胎码
+ * @property int $pickcode_serve 服务队取胎码
+ * @property int $community 社区订单
+ * @property int $sid
+ * @property string $ext 订单日志记录，使用^^分割每条记录
+ * @property int $creditsettle 0-未结算,1-自动结算,2-客服结算
+ * @property string $id_name 证件姓名
+ * @property int $deleted 删除订单，0为正常，1为删除
+ * @property int $customs_status 1运单号已绑定，发送海关中 ,3海关已接收,4已拣货,5已付运,8清关未通过,-1已取消
+ * @property string $order_guid 订单报文唯一编码
+ */
+class ShoppingOrder extends \yii\db\ActiveRecord {
+    private $connection;
+
+    public static $orderStatus = [
+        '-1' => '取消订单',
+        '-2' => '系统取消',
+        '0'  => '未支付',
+        '1'  => '已付款',
+        '2'  => '已取货',
+        '5'  => '结束',
+    ];
+
+    public function init(){
+        $this->connection = Yii::$app->db;
+    }
+
+    public static function tableName()
+    {
+        return '{{%shopping_order}}';
+    }
+
+    public static function generateOrderSn() {
+        return date('ymdHi').str_replace('4', rand(5,9), rand(100000,999999));
+    }
+
+    public static function getStatusName($status) {
+        return ShoppingOrder::$orderStatus[$status];
+    }
+
+    public static function getPickStatus($total, $picked) {
+        $res = '未取完';
+        if($picked==0)  $res = '未取胎';
+        if($picked==$total)  $res = '已取胎';
+        return $res;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['weid', 'uid', 'cabinetid', 'hassub_order', 'couponid', 'status', 'sendtype', 'paytype', 'goodstype', 'addressid', 'sendexpress', 'dispatch', 'send', 'createtime', 'cancelgoods', 'receipttime', 'accomplish', 'paymenttime', 'community', 'sid', 'creditsettle', 'deleted', 'customs_status', 'pickcode_user', 'pickcode_serve'], 'integer'],
+            [['ordersn', 'sendtype', 'paytype', 'addressid', 'createtime'], 'required'],
+            [['price', 'taxtotal', 'goodsprice', 'coupon', 'dispatchprice'], 'number'],
+            [['ext'], 'string'],
+            [['source'], 'string', 'max' => 3],
+            [['from_user', 'expresssn'], 'string', 'max' => 50],
+            [['parent_ordersn', 'ordersn'], 'string', 'max' => 16],
+            [['transid'], 'string', 'max' => 32],
+            [['remark'], 'string', 'max' => 1000],
+            [['realname'], 'string', 'max' => 20],
+            [['mobile', 'id_name'], 'string', 'max' => 15],
+            [['id_no'], 'string', 'max' => 18],
+            [['province', 'city', 'area', 'expresscom'], 'string', 'max' => 30],
+            [['address'], 'string', 'max' => 300],
+            [['express'], 'string', 'max' => 200],
+            [['order_guid'], 'string', 'max' => 64],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id'             => 'ID',
+            'weid'           => 'Weid',
+            'uid'            => 'Uid',
+            'source'         => 'Source',
+            'cabinetid'      => 'Cabinetid',
+            'from_user'      => 'From User',
+            'hassub_order'   => 'Hassub Order',
+            'parent_ordersn' => 'Parent Ordersn',
+            'ordersn'        => 'Ordersn',
+            'price'          => 'Price',
+            'taxtotal'       => 'Taxtotal',
+            'goodsprice'     => 'Goodsprice',
+            'coupon'         => 'Coupon',
+            'couponid'       => 'Couponid',
+            'status'         => 'Status',
+            'sendtype'       => 'Sendtype',
+            'paytype'        => 'Paytype',
+            'transid'        => 'Transid',
+            'goodstype'      => 'Goodstype',
+            'remark'         => 'Remark',
+            'addressid'      => 'Addressid',
+            'realname'       => 'Realname',
+            'mobile'         => 'Mobile',
+            'id_no'          => 'Id No',
+            'province'       => 'Province',
+            'city'           => 'City',
+            'area'           => 'Area',
+            'address'        => 'Address',
+            'express'        => 'Express',
+            'expresscom'     => 'Expresscom',
+            'expresssn'      => 'Expresssn',
+            'sendexpress'    => 'Sendexpress',
+            'dispatchprice'  => 'Dispatchprice',
+            'dispatch'       => 'Dispatch',
+            'send'           => 'Send',
+            'createtime'     => 'Createtime',
+            'cancelgoods'    => 'Cancelgoods',
+            'receipttime'    => 'Receipttime',
+            'accomplish'     => 'Accomplish',
+            'paymenttime'    => 'Paymenttime',
+            'community'      => 'Community',
+            'pickcode_user'  => 'UserPickcode',
+            'pickcode_serve' => 'ServePickcode',
+            'sid'            => 'Sid',
+            'ext'            => 'Ext',
+            'creditsettle'   => 'Creditsettle',
+            'id_name'        => 'Id Name',
+            'deleted'        => 'Deleted',
+            'customs_status' => 'Customs Status',
+            'order_guid'     => 'Order Guid',
+        ];
+    }
+
+}

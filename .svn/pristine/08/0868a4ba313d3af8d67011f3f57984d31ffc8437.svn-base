@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="csrf-param" content="_csrf">
+<meta name="csrf-token" content="EzQXdq0S-zcODzqNqvZF-xMWJBOfi8VRcIrSedmDaGN8bnAdzHOhWT1QDcuYhyykdUJ9IdjKkyFEy41IvrMZAg==">
+  <![CDATA[YII-BLOCK-HEAD]]>  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta name="keywords" content="自助购胎,多轮多微服务,智慧新零售服务"/>
+  <meta name="description" content="多轮多微服务，致力于打造便捷、高性价比的自助购买、换胎服务平台。"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+  <meta content="telephone=no" name="format-detection"/>
+  <meta http-equiv="pragma" content="no-cache"/>
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="visit-user-ip" content="113.89.238.171">
+  <title>404 - 您访问的页面出错了！</title>
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <meta http-equiv="x-dns-prefetch-control" content="on"/>
+  <link rel="dns-prefetch" href=""/>
+  <link rel="stylesheet" href="https://cdn.bootcss.com/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+  <link href="/styles/common.css" rel="stylesheet">
+  <link href="/fonts/fonts.css" rel="stylesheet">
+  <script src="https://cdn.bootcss.com/jquery/2.1.4/jquery.min.js"></script>
+  <script type="text/javascript" src="http://libs.baidu.com/jquery.cookie/1.4.1/jquery.cookie.min.js"></script>
+  <script src="https://cdn.bootcss.com/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="//res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+</head>
+<body>
+<![CDATA[YII-BLOCK-BODY-BEGIN]]><div class="container"><style type="text/css">
+body{background-color:#fff;}
+.negation{
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: hidden;
+    background-color: #fff;
+    text-align: center;
+}
+.negation img{
+    width: 60%;
+    display: inline-block;
+    margin-top: 20%;
+    border-radius: 5px;
+    border:solid #0e91d8 1px;
+    margin-bottom: 15px;
+}
+.negation ul{
+    width: 100%;
+    display: block;
+    overflow: hidden;
+}
+.negation ul li{
+    width: 100%;
+    display: block;
+    overflow: hidden;
+    font-family: "微软雅黑";
+    text-align: center;
+}
+.negation ul h3 {
+    color: #000;
+    font-size: 20px;
+    display: inline-block;
+    line-height: 30px;
+}
+.negation ul h4 {
+    color: #000;
+    font-size: 18px;
+    display: inline-block;
+    line-height: 26px;
+}
+.negation ul p {
+    color: #9e9e9e;
+    font-size: 14px;
+    display: inline-block;
+    line-height: 22px;
+}
+.negation a{
+    display: inline-block;
+    margin-top: 20px;
+    line-height: 36px;
+    width:30%;
+    background-color: #0e91d8;
+    font-family: "微软雅黑";
+    color:#fff;
+    font-size: 18px;
+    border-radius: 5px;
+}
+
+</style>
+<div class="negation">
+    <img src="/images/404.jpg">
+    <ul>
+        <li><h3>很抱歉！</h3></li>
+        <li><h4>您访问的页面出错了</h4></li>
+        <li><p>您可以通过以下方式继续访问...</p></li>
+    </ul>
+    <a href="/">返回首页</a>
+</div></div>
+<![CDATA[YII-BLOCK-BODY-END]]></body>
+<!-- STAT_ANALYSIS_CODE -->
+<div style="display:none"></div>
+</html>

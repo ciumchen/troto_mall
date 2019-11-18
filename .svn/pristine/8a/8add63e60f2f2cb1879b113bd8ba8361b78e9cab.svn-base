@@ -1,0 +1,21 @@
+<!--底部固定栏-->
+<div class="col-xs-12 clearPadding bottoms indexbottom">
+    <div class="col-xs-4 text-center indexb">
+        <a href="/">
+            <i class="iconfont text-blue">&#xe604;</i>
+            <div>首页</div>
+        </a>
+    </div>
+    <div class="col-xs-4 text-center ">
+        <a href="/order/list">
+            <i class="iconfont text-muted">&#xe603;</i>
+            <div>我的订单</div>
+        </a>
+    </div>
+    <div class="col-xs-4 text-center ">
+        <a href="/member/index">
+            <i class="iconfont text-yiwanchengdingdan">&#xe601;</i>
+            <div>会员中心</div>
+        </a>
+    </div>
+</div>

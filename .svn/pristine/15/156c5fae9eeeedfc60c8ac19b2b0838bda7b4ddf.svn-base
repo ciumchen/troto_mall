@@ -1,0 +1,234 @@
+<?php
+namespace frontend\models;
+
+use Yii;
+use yii\base\Model;
+use yii\db\Query;
+
+/**
+ * This is the model class for table "{{%members}}".
+ *
+ * @property int $uid
+ * @property string $unionid
+ * @property string $openid
+ * @property string $mobile
+ * @property string $username
+ * @property string $nickname
+ * @property string $realname 真实姓名
+ * @property string $carsn 车牌号
+ * @property int $brokerid null 无分销上级分销商，0 代理商，>0 分销商有分销上级
+ * @property string $deposit 余额
+ * @property string $password
+ * @property string $salt
+ * @property int $type
+ * @property int $status
+ * @property string $credits1 可消费余额
+ * @property string $credits2 累计消费额
+ * @property string $credits3 积分点数
+ * @property string $credits4 红包金额
+ * @property string $credits5 总分成金额
+ * @property string $credits6 可提现分成金额
+ * @property string $credits7 分销下线总消费额
+ * @property string $avatar 头像
+ * @property int $gender 性别
+ * @property int $joindate
+ * @property string $joinip
+ * @property int $lastvisit
+ * @property string $lastip 上次登录IP
+ * @property int $follow 是否关注
+ * @property int $followtime 关注时间
+ * @property int $unfollowtime 取关时间
+ * @property string $remark 备注
+ * @property int $starttime 有效期开始时间
+ * @property int $endtime 有效期结束时间
+ * @property int $groupid 用户所在的微信分组ID
+ * @property int $createtime 创建时间
+ * @property int $updatedt 信息最后更新时间
+ */
+class Users extends \yii\db\ActiveRecord {
+
+    private $connection;
+
+    public function init(){
+        parent::init();
+        $this->connection = Yii::$app->db;
+    }
+
+    public static function tableName() {
+        return '{{%members}}';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules() {
+        return [
+            //[['openid', 'username', 'password', 'salt', 'status'], 'required'],
+            [['uid', 'brokerid', 'type', 'status', 'gender', 'joindate', 'lastvisit', 'follow', 'followtime', 'unfollowtime', 'starttime', 'endtime', 'groupid', 'createtime', 'updatedt'], 'integer'],
+            [['deposit', 'credits1', 'credits2', 'credits3', 'credits4', 'credits5', 'credits6', 'credits7'], 'number'],
+            [['unionid', 'openid'], 'string', 'max' => 52],
+            [['mobile'], 'string', 'max' => 11],
+            [['username'], 'string', 'max' => 30],
+            [['realname'], 'string', 'max' => 20],
+            [['avatar'], 'string', 'max' => 255],
+            [['joinip', 'lastip'], 'string', 'max' => 15],
+            [['remark'], 'string', 'max' => 500],
+            // [['nickname'], 'string'],
+            // [['openid'], 'unique'],
+            // [['unionid'], 'unique'],
+        ];
+    }
+
+    public function attributeLabels() {
+        return [
+            'uid'          => 'Uid',
+            'unionid'      => 'Unionid',
+            'openid'       => 'Openid',
+            'mobile'       => 'Mobile',
+            'username'     => 'Username',
+            'nickname'     => 'Nickname',
+            'realname'     => 'Realname',
+            'carsn'        => 'Carsn',
+            'brokerid'     => 'Brokerid',
+            'deposit'      => 'Deposit',
+            'password'     => 'Password',
+            'salt'         => 'Salt',
+            'type'         => 'Type',
+            'status'       => 'Status',
+            'credits1'     => 'Credits1',
+            'credits2'     => 'Credits2',
+            'credits3'     => 'Credits3',
+            'credits4'     => 'Credits4',
+            'credits5'     => 'Credits5',
+            'credits6'     => 'Credits6',
+            'credits7'     => 'Credits7',
+            'avatar'       => 'Avatar',
+            'gender'       => 'Gender',
+            'joindate'     => 'Joindate',
+            'joinip'       => 'Joinip',
+            'lastvisit'    => 'Lastvisit',
+            'lastip'       => 'Lastip',
+            'follow'       => 'Follow',
+            'followtime'   => 'Followtime',
+            'unfollowtime' => 'Unfollowtime',
+            'remark'       => 'Remark',
+            'starttime'    => 'Starttime',
+            'endtime'      => 'Endtime',
+            'groupid'      => 'Groupid',
+            'createtime'   => 'Createtime',
+            'updatedt'     => 'Updatedt',
+        ];
+    }
+
+    public function login($uid, $openid = '') {
+        Yii::$app->session['userinfo'] = ['uid' => $uid, 'openid' => $openid];
+    }
+
+    /*
+	* 用户信息查询
+    */
+    public function userinfo($uid, $nickname = '')
+    {
+        if ($uid != '') {
+            $conditions = ['m.`uid`' => $uid];
+        }
+        if ($nickname != '') {
+            $conditions = ['m.`nickname`' => $nickname];
+        }
+        $query = (new Query())
+            ->select('*')
+            ->from($this->tableName() . ' as m')
+            ->where($conditions)
+            ->one();
+
+        return $query;
+    }
+
+
+    /**
+     * 根据条件，返回一个用户记录
+     *
+     * @param array $condition
+     * @return array|null|ActiveRecord
+     */
+    public function get($condition = [])
+    {
+        return $this::find()->where($condition)->one();
+    }
+
+    /**
+     * 关注微信
+     *
+     * @param $openid
+     * @param string $scene_id
+     * @return mixed
+     */
+    public function createFollowWeChat($openid, $scene_id = '')
+    {
+        //记录日志
+        Yii::info("[account create] openid: $openid    scenceid: $scene_id");
+
+        $user = $this->get(['openid' => $openid]);
+
+        //客户没有帐号，新增加帐号
+        if ($user == null) {
+            $user = $this->newAccount(['openid' => $openid]);
+        }
+
+        //绑定分销上线
+        if ($scene_id !== '') {
+            $this->bindBroker($user->uid, $scene_id);
+        }
+
+        return $user->uid;
+    }
+
+    public function newAccount($userinfo) {
+        $users = new Users;
+        $users->username = $userinfo['username'];
+        $users->openid   = $userinfo['openid'];
+        $users->unionid   = $userinfo['unionid'];
+        $users->nickname = $userinfo['nickname'];
+        $users->avatar   = $userinfo['avatar'];
+        $users->gender   = $userinfo['sex'];
+        $users->brokerid = isset($userinfo['brokerid']) ? $userinfo['brokerid'] : 0;
+        $users->password = '';
+        $users->salt     = '';
+        $users->type     = 0;
+        $users->status   = 0;
+        $users->joindate  = time();
+        $users->joinip    = Yii::$app->request->userIP;
+        $users->lastvisit = time();
+        $users->lastip    = Yii::$app->request->userIP;
+        $users->remark    = '';
+        $users->createtime = time();
+        $users->starttime  = 0;
+        $users->endtime    = 0;
+        $users->groupid    = 0;
+        $users->save();
+
+        return $users;
+    }
+
+    public function bindBroker($uid, $broker_id)
+    {
+        $user = $this->get(['uid' => $uid]);
+        $user->brokerid = $broker_id;
+        $user->save();
+    }
+
+    public function addCredits2($uid, $amount)
+    {
+        $user = $this->get(['uid' => $uid]);
+        $user->credits2 += $amount;
+        $user->save();
+    }
+
+    //用户资料修改
+    public function updateUserInfo($field, $value, $uid)
+    {
+        $state = $this::updateAll(array($field => $value), 'uid = ' . $uid);
+        return $state;
+    }
+
+}

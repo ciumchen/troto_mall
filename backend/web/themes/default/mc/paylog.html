@@ -1,0 +1,143 @@
+{template 'common/header'}
+<style>
+	table .navbar-inner>tr>th{text-align: center}
+	table tbody >tr>td{text-align: center}
+</style>
+<ul class="nav nav-tabs">
+	<li {if $do == 'display'}class="active"{/if}>
+		<a href="{php echo url('mc/sign/display');}">付款记录</a>
+	</li>
+</ul>
+{if $do == 'display'}
+	<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-horizontal order-horizontal" role="form" id="form1">
+				<input type="hidden" name="c" value="mc" />
+				<input type="hidden" name="a" value="paylog" />
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">ID</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="plid" id="" type="text" value="{$_GPC['plid']}" placeholder="可查询ID">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">用户UID/OPENID</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="uid" id="" type="text" value="{$_GPC['uid']}" placeholder="可查询用户UID/OPENID">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">支付方式</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<select name="type" class="form-control">
+							<option value="">不限</option>
+							<option value="wechat" {if $_GPC['type'] == 'wechat'}selected{/if}>微信支付</option>
+							<option value="credit" {if $_GPC['type'] == 'credit'}selected{/if}>余额支付</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">流水号</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="tid" id="" type="text" value="{$_GPC['tid']}" placeholder="可查询流水号">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">金额</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="fee" id="" type="text" value="{$_GPC['fee']}" placeholder="可查询金额">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">付款状态</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<select name="status" class="form-control">
+							<option value="" {if $_GPC['status'] == ''}selected{/if}>不限</option>
+							<option value="1" {if $_GPC['status'] == '1'}selected{/if}>已付款</option>
+							<option value="0" {if $_GPC['status'] == '0'}selected{/if}>未付款</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">付款类型</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<select name="module" class="form-control">
+							<option value="" {if $_GPC['module'] == ''}selected{/if}>不限</option>
+							<option value="ewei_shopping" {if $_GPC['module'] == 'ewei_shopping'}selected{/if}>购买</option>
+							<option value="recharge" {if $_GPC['module'] == 'recharge'}selected{/if}>充值</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-sm-3 col-lg-2">
+						<button class="btn btn-default">
+							<i class="fa fa-search"></i> 搜索
+						</button>
+					</div>
+			</form>
+		</div>
+	</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				会员基本付款记录 （当前搜索到 <label class="text text-danger" id="total-text">{$res['total']}</label> 条数据）
+			</div>
+			<div class="panel-body table-responsive" ng-controller="advAPI">
+				<table class="table table-hover"  style="width:100%;z-index:-10;" cellspacing="0" cellpadding="0">
+					<thead class="navbar-inner">
+						<tr>
+							<th>ID</th>
+							<th>支付方式</th>
+							<th>用户</th>
+							<th>流水号</th>
+							<th>付款类型</th>
+							<th>金额</th>
+							<th>付款状态</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						{loop $res['list'] $item}
+						<tr>
+							<td>{$item['plid']}</td>
+							<td>{if $item['type'] == 'wechat'}<span class="label label-success">微信支付</span>{else}<span class="label label-info">余额支付</span>{/if}</td>
+							<td>{if $item['bnickname'] !== null}{$item['bnickname']}{else}{$item['cnickname']}{/if}</td>
+							<td>{$item['tid']}</td>
+							<td>{if $item['module'] == 'ewei_shopping'}<span class="label label-info">购买</span>{else}<span class="label label-success">充值</span>{/if}</td>
+							<td>{$item['fee']}</td>
+							<td>{if $item['status'] == 0}<span class="label label-danger">未付款</span>{else}<span class="label label-success">已付款</span>{/if}</td>
+							<td>
+								<a href="javascript:void(0);" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" onclick="deleteNodes(this);" title="删除"><i class="fa fa-times"></i></a>
+							</td>
+						</tr>
+						{/loop}
+					</tbody>
+				</table>	
+			</div>
+		</div>	
+		{$res['pager']}
+</div>
+<script>
+
+	function deleteNodes(is_this,event){
+		if(confirm("Do you really want to delete it ? ")){
+			var PlidNodes = is_this.parentNode.parentNode.childNodes[1],
+				plId = PlidNodes.innerHTML,
+				data = {plid: plId};
+
+			$.get('./index.php?c=mc&a=paylog',data,function(Request){
+					if(Request.status == 200){
+						document.getElementById('total-text').innerHTML = Request.total;
+						window.location.reload(true);
+						alert(Request.msc);
+					} else {
+						alert(Request.msc);
+						return false;
+					}
+			},'json');
+		}
+		
+	}
+</script>
+{/if}	
+{template 'common/footer'}

@@ -1,0 +1,52 @@
+{
+    "name": "troto-app/wechatmall",
+    "description": "TrotoApp_Wechatmall based on yii2 Advanced Project Template && Wengine.",
+    "keywords": ["yii2", "framework", "TrotoApp"],
+    "homepage": "http://www.troto.com.cn/",
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/yiisoft/yii2/issues?state=open",
+        "wiki": "http://www.yiiframework.com/wiki/"
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.6.0",
+        "yiisoft/yii2": "~2.0.16",
+        "yiisoft/yii2-bootstrap": "~2.0.0",
+        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
+        "yiisoft/yii2-imagine": "^2.0",
+        "yiisoft/yii2-httpclient": "*",
+        "yiier/yii2-return-url": "*",
+        "yiier/yii2-merit": "*",
+        "yiier/yii2-backup": "*",
+        "2amigos/qrcode-library": "*",
+        "jianyan74/yii2-easy-wechat": "^1.1",
+        "sotechn/yii2-geohash": "^0.1.3"
+    },
+    "require-dev": {
+        "yiisoft/yii2-debug": "~2.1.0",
+        "yiisoft/yii2-gii": "~2.1.0",
+        "yiisoft/yii2-faker": "~2.0.0",
+        "yiisoft/yii2-codeception": "*",
+        "codeception/base": "^2.4.0",
+        "phpunit/phpunit": "~6.5.5",
+        "codeception/verify": "~1.0.0",
+        "symfony/browser-kit": ">=2.7 <=4.2.4"
+    },
+    "config": {
+        "process-timeout": 1800,
+        "fxp-asset": {
+            "installer-paths": {
+                "npm-asset-library": "vendor/npm",
+                "bower-asset-library": "vendor/bower"
+            }
+        }
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://mirrors.aliyun.com/composer/"
+        }
+    }
+}

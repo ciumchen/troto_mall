@@ -1,0 +1,22 @@
+<ul class="nav nav-tabs">
+	{if $do == 'suppliers'}
+		<li {if $do == 'suppliers' && $operation == 'display'} class="active" {/if}>
+			<a href="{php echo url('ma/suppliers/suppliers')}">供应商</a>
+		</li>
+		<li {if $do == 'suppliers' && $operation == 'handle'} class="active" {/if}>
+			<a href="{php echo url('ma/suppliers/suppliers', array('op'=>'handle'))}">
+				{$ptr_title}
+			</a>
+		</li>
+	{/if}
+	{if $do == 'address'}
+		<li {if $do == 'address' && $operation == 'display'} class="active"{/if}>
+			<a href="{php echo url('ma/suppliers/address')}">供应商地址</a>
+		</li>
+		<li {if $do == 'address' && $operation == 'handle'} class="active" {/if}>
+			<a href="{php echo url('ma/suppliers/address', array('op'=>'handle', 'sid' => $_GPC['sid']))}">
+				{$ptr_title}
+			</a>
+		</li>
+	{/if}
+</ul>

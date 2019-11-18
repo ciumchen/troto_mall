@@ -1,0 +1,143 @@
+{template 'common/header'}
+{template 'mc/header'}
+<style>
+	/*手机余额充值*/
+	.charge select{position:absolute;}
+	.charge .panel-body span input{position:absolute; width:150px; height:30px; top:2px; border:none; left:42px; z-index:10; padding-left:10px; outline:none;}
+	.charge.panel{margin:6px 6px 60px; border:none;}
+	.charge.panel-info>.panel-heading {background: -webkit-gradient(linear, 0 0, 100% 0, from(#ebebeb), to(#f3f9fa), color-stop(30%, #f5f9f9)); color:#666666; border:none;}
+	a{color:#666666;}a:hover{color: #3ebacc;}
+	.charge .btn.btn-primary{background: #56c6d6; color: #FFF; border: 0;}
+	.charge i{display:inline-block; width:15px; height:15px; text-align:center; line-height:15px;}
+</style>
+<script type="text/javascript" src="../addons/ewei_shopping/images/util.js"></script>
+<div class="charge panel panel-info">
+	<div class="panel-body">
+		<form class="rechange-form" name="theform" method="get" role="form" id="form1">
+			<input type="hidden" name="c" value="entry" />
+			<input type="hidden" name="m" value="recharge" />
+			<input type="hidden" name="i" value="{$_W['uniacid']}" />
+			<input type="hidden" name="do" value="pay" />
+			<input type="hidden" name="token" value="{$_W['token']}">
+			<input type="hidden" class="rechange-hide" name="moneySe" value="0" />
+			<ul class="rechange-list">
+				<li>
+					<a href="javascript:;" data-money="500.00">
+						<div class="rechange-main">
+							<h3>充值<span>500</span>元</h3>
+							<p>赠送红包50元</p>
+						</div>
+					</a>
+				</li>
+				<li>
+					<a href="javascript:;" data-money="1000.00">
+						<div class="rechange-main">
+							<h3>充值<span>1000</span>元</h3>
+							<p>赠送红包100元</p>
+						</div>
+					</a>
+				</li>
+				<li>
+					<a href="javascript:;" data-money="5000.00">
+						<div class="rechange-main">
+							<h3>充值<span>5000</span>元</h3>
+							<p>赠送红包500元</p>
+						</div>
+					</a>
+				</li>
+				<li>
+					<a href="javascript:;" data-money="10000.00">
+						<div class="rechange-main">
+							<h3>充值<span>10000</span>元</h3>
+							<p>赠送红包1000元</p>
+						</div>
+					</a>
+				</li>
+			</ul>
+			<div class="rechange-num">
+				<div class="rechange-num-con">
+					<input type="text" name="money" class="rechange-txt" placeholder="输入其他金额充值"/>
+					<input type="submit" name="submit" class="rechange-num-btn" value="立即充值" />
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script>
+	function SubmitValue(opts) {
+		this._form = opts._form;
+		this.ele = opts.ele;
+		this.txt = opts.txt;
+		this.btn = opts.btn;
+		this.hide = opts.hide;
+
+		this.init();
+	}
+	SubmitValue.prototype = {
+		constructor: SubmitValue,
+		// 点击快速充值
+		preferential: function() {
+			var that = this;
+			this.ele.find('a').on('touchend', function(e) {
+				e.preventDefault();
+				that.ele.find('a').removeClass('on');
+				$(this).addClass('on');
+
+				var money = $(this).attr('data-money');
+				if (!money) return;
+				// 数据打入隐藏域
+				that.txt.val(money);
+				// 提交表单
+				that._form.submit();
+			});
+			this.txt.on('keyup', function(e) {
+				if (e.keyCode != 8) {
+					var $this = $(this);
+					$this.val($this.val().replace(/[^0-9\.]/g, ''));
+				}
+			});
+		},
+		// 点击自定义充值
+		customRecharge: function() {
+			var that = this;
+			this._form.on('submit', function(e) {
+				// e.preventDefault();
+				var val = that.txt.val().trim(),
+					reg = /^[0-9]+(.[0-9]{1,2})?$/,
+					strInfo = '';
+				if (!val) {
+					strInfo = '充值余额不能为空！';
+				} else {
+					if (!reg.test(val)) {
+						strInfo = '充值余额只能是数字！';
+					} else {
+						if (val <= 0) {
+							strInfo = '充值余额不能低于50.00元';
+						}
+					}
+				}
+				if (strInfo != '') {
+					Util.promptBox({
+						title: 'note',
+						info: strInfo,
+						leftBtn: '我知道了'
+					});
+					return false;
+				}
+			});
+		},
+		init: function() {
+			this.preferential();
+			this.customRecharge();
+		}
+	};
+	new SubmitValue({
+		_form: $('#form1'),
+		ele: $('.rechange-list li'),
+		txt: $('.rechange-txt'),
+		btn: $('.rechange-num-btn'),
+		hide: $('.rechange-hide')
+	});
+</script>
+{template 'common/toolbar'}
+{template 'mc/footer'}

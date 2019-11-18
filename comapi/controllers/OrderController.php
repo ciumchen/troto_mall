@@ -1,0 +1,106 @@
+<?php
+namespace comapi\controllers;
+
+use Yii;
+use yii\web\Request;
+
+use common\models\ShoppingOrder;
+use common\models\ShoppingOrderGoods;
+
+class OrderController extends BaseController {
+
+    public function init() {
+        parent::init();
+        $this->checkAuth();
+        $this->rpc = new \Yar_Client(Yii::$app->params['RpcServiceUri'].'?order');
+        $this->rpc->SetOpt(YAR_OPT_CONNECT_TIMEOUT, 3000);
+        $this->rpc->SetOpt(YAR_OPT_TIMEOUT, 0);
+    }
+
+<<<<<<< .mine
+        /*
+         * 支付结果
+         * @param string ordersn 订单号
+         *
+         * */
+        public function actionPayres() {
+            Yii::$app->response->format = $this->fromatJson;
+            $resp = [
+                'code' => '4003',
+                'msg'  => 'Request Invalid',
+                'data' => []
+||||||| .r50
+        /*
+         * 支付结果
+         * @param string ordersn 订单号
+         *
+         * */
+        public function actionPayres() {
+            Yii::$app->response->format = $this->fromatJson;;
+            $resp = [
+                'code' => '4003',
+                'msg'  => 'Request Invalid',
+                'data' => []
+=======
+    /*
+     * 支付结果
+     * */
+    public function actionPayres() {
+        $ordersn = intval(yii::$app->request->post('ordersn'));
+        $orderModel = ShoppingOrder::find()->where(['ordersn'=>$ordersn])->one();
+        $data = [];
+        if ($orderModel->status==1) {
+            $skus    = [];
+            $ogModel = new ShoppingOrderGoods;
+            $ogList  = $ogModel->getOrderGoodsList($orderModel->id);
+            if (isset($ogList[0])) {
+                $ogItem = $ogList[0];
+                $skus   = [
+                    "name"    => $ogItem['title'],
+                    "pathway" => $ogItem['pathway'],
+                    "sn"      => $ogItem['goodssn'],
+                    "sku"     => $ogItem['productsn'],
+                    "price"   => $ogItem['price'],
+                    "total"   => $ogItem['total'],
+                    "num"     => $ogItem['total'] - $ogItem['picknum'],
+                    "orderdt" => $orderModel->createtime,
+                    "pickdt"  => $ogItem['picktime'],
+                    "status"  => ShoppingOrder::getPickStatus($ogItem['total'], $ogItem['picknum']),
+                ];
+            }
+            $data = [
+                "ordersn" => strval($ordersn),
+                "timeout" => 180, //转入取胎操作超时时间
+                "result"  => "PAY_FINISH",
+                "sku"     => $skus
+>>>>>>> .r60
+            ];
+        } else if ($orderModel->status==0) {
+            $data = [
+                "ordersn" => strval($ordersn),
+                "timeout" => 180, //转入取胎操作超时时间
+                "result"  => "PAY_NOT",
+                "sku"     => []
+            ];
+        } else if ($orderModel->status<0) {
+            $data = [
+                "ordersn" => strval($ordersn),
+                "timeout" => 180, //转入取胎操作超时时间
+                "result"  => "PAY_CANCLE",
+                "sku"     => []
+            ];
+        } else {
+            $data = [
+                "ordersn" => strval($ordersn),
+                "timeout" => 180, //转入取胎操作超时时间
+                "result"  => "PAY_EMPTY",
+                "sku"     => []
+            ];
+        }
+
+        $this->resp['code'] = 2000;
+        $this->resp['msg']  = 'ok';
+        $this->resp['data'] = $data;
+        return $this->resp;
+    }
+}

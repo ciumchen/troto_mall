@@ -1,0 +1,255 @@
+{php $newUI = true;}
+{template 'common/header'}
+
+<ol class="breadcrumb" style="padding:5px 0;">
+	<li><a href="{url 'home/welcome/ext'}"><i class="fa fa-cogs"></i> &nbsp; {$module_types}</a></li>
+	<li><a href="{url 'home/welcome/ext' array('m' => $module['name'])}">{$module}</a></li>
+</ol>
+{template 'common/suppliers-nav'}
+{if $operation == 'display'}
+<div class="panel panel-default">
+	<div class="panel-body table-responsive" >
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th>公司</th>
+					<th>收货人</th>
+					<th>手机</th>
+					<th>收货地址</th>
+					<th>状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list $item}
+				<tr class="list" data-sid='{$item["sid"]}' data-state='{$item["status"]}'>
+					<td>{$item['company']}</td>
+					<td>{$item['realname']}</td>
+					<td>{$item['mobile']}</td>
+					<td>{$item['province']}{$item['city']}{$item['area']}</td>
+					<td >
+						{if $item['status'] == '1'}
+						<span class="btn btn-success btn-sm">正常</span>
+						{else if $item['status'] == '0'}
+						<span class="btn btn-danger btn-sm">禁用</span>
+						{/if}
+					</td>
+					<td>
+						<a class="btn btn-info btn-sm" href="{php echo url('ma/suppliers/address',array('said'=>$item['said'],'op'=>'handle'))}">编辑</a>
+						<a class="btn btn-info btn-sm" href="{php echo url('ma/suppliers/address',array('said'=>$item['said'],'op'=>'detail'))}">详情</a>
+						{if $oaid && $ogid}
+							<a class="btn btn-success" href="{php echo url('site/entry/aftermarket',array('op'=>'ConfirmSale','oaid'=>$oaid,'ogid'=>$ogid,'m'=>'ewei_shopping','said'=>$item['said']))}">选择并审核确认</a>
+						{/if}
+					</td>
+				{/loop}
+			</tbody>
+		</table>
+	</div>
+</div>
+{$pager}
+{else if $operation == 'handle'}
+<script src="/web/resource/components/area/cascade.js"></script>
+{if $id}
+<div class="panel panel-default">
+	<div class="panel-heading">供应商地址信息</div>
+	<div class="panel-body">
+		<div class="form-group" style="float:left;width:50%">
+			<label style="width:200px;text-align:right" class="ol-xs-5 col-md-3 control-label">收货人：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $item['realname'] == ""}无{else}{$item['realname']}{/if}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:50%">
+			<label style="width:200px;text-align:right" class="ol-xs-5 col-md-3 control-label">手机：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $item['mobile'] == ""}无{else}{$item['mobile']}{/if}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:50%">
+			<label style="width:200px;text-align:right" class="ol-xs-5 col-md-3 control-label">地区：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$item['province']}{$item['city']}{$item['area']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:50%">
+			<label style="width:200px;text-align:right" class="ol-xs-5 col-md-3 control-label">详细地址：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $item['address'] == ""}无{else}{$item['address']}{/if}</span>
+			</div>
+		</div>
+	</div>	
+</div>
+{/if}
+<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			{$ptr_title}
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">对应供应商：</label>
+				<div class="col-sm-9 col-xs-12">
+					<select name="fetch-item" class="form-control fetch-item">
+						<option selected>请选择</option>
+					{loop $suppliersAllList $spList}
+						<option value="{$spList['sid']}">{$spList['linkman']}</option>
+					{/loop}
+					</select>
+				</div>
+			</div>
+			<div class="form-group" style="display:none" id="suppliers-mobile">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">供应商手机：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control"  readonly="readonly">
+					{loop $suppliersAllList $spList}
+						<input type="hidden" class="fetch-mobile" value="{$spList['mobile']}" data-rol="{$spList['sid']}">
+					{/loop}
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">收货人：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input  class="form-control" name="realname">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">收货人手机：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input  class="form-control" name="mobile" >
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">地区：</label>
+				<div class="col-sm-9 col-xs-12 sel-addr-select">
+					<select id="sel-provance" name="province" onChange="selectCity();" class="pull-left form-control">
+						<option value="" selected="true">省/直辖市</option>
+					</select>
+					<select id="sel-city" name="city" onChange="selectcounty()" class="pull-left form-control">
+						<option value="" selected="true">请选择</option>
+					</select>
+					<select id="sel-area" name="area" class="pull-left form-control">
+						<option value="" selected="true">请选择</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">详细地址：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="address" value="{$item['address']}">
+				</div>
+			</div>
+			<div class="form-group col-sm-12">
+				<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+				<input type="hidden" name="said" value="{$item['said']}">
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+	</div>
+</form>
+{else if $operation == 'detail'}
+<div class="panel panel-default">
+	<div class="panel-heading">地址详情</div>
+	<div class="panel-body">
+		<div class="form-group" style="float:left;width:30%">
+			<label class="col-xs-12 col-md-4 control-label">收货人：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailList['realname']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:30%">
+			<label class="col-xs-12 col-md-3 control-label">手机：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailList['amobile']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:25%">
+			<label class="col-xs-12 col-md-5 control-label">收货地址：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailList['address']}</span>
+			</div>
+		</div>
+
+	</div>
+	<div style="width:100%;border-bottom:1px dashed #ddd"></div>
+	<div class="panel-body">
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-4 control-label">供应商联系人：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailList['linkman']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-2 control-label">公司：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailList['company']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-2 control-label">手机：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailList['bmobile']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-2 control-label">电话：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailList['tel']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-2 control-label">邮箱：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailList['email']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-2 control-label">QQ：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailList['qq']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-2 control-label">网站：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailList['site']}</span>
+			</div>
+		</div>
+	</div>
+</div>
+{/if}
+<script>
+	cascdeInit("{$item['province']}","{$item['city']}","{$item['area']}");
+
+$(function(){
+	var $fetchItem = $('.fetch-item');
+	 $fetchItem.on('change',function(){
+
+	 	var Item = $(this).children();
+	 	//console.log(Item)
+	 	Item.each(function(){
+	 		if($(this).get(0).selected == true){	
+	 			var this_Id = $(this).val(),
+	 				fetchMobile = $('.fetch-mobile');
+	 			fetchMobile.each(function(){
+	 				var $this = $(this);
+	 				 if($this.attr('data-rol') == this_Id){
+			 				var fetchMobileTxt = $this.val();
+			 				$("#suppliers-mobile").show();
+			 				$this.parent('div').children(":first").val(fetchMobileTxt);
+			 		 }
+	 			})
+	 			if($(this).get(0).index === 0){
+	 					fetchMobile.parent('div').children(":first").val("");
+	 					$("#suppliers-mobile").hide();
+	 			}	
+	 		}
+	 		
+	 	})
+	 })
+})
+</script>
+
+
+
+{template 'common/footer'}

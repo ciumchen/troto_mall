@@ -1,0 +1,6 @@
+{php $newUI = true;}
+{template 'common/header'}
+
+
+
+{template 'common/footer'}

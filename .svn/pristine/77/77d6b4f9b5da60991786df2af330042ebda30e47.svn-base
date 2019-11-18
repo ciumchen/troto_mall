@@ -1,0 +1,54 @@
+<?php $this->title = '支付结果 - '.Yii::$app->params['site_name'];?>
+<style type="text/css">
+.blk { background: #fff; border-radius: 10px; margin: 5px 10px; height: 100%; padding: 10px; width: 95%; }
+.blk button {font-size: 18px;}
+.list-group-item-text{ line-height: 1.5; }
+.ordetail{ color: #3e5569; font-weight:bold; font-size:18px; }
+.btnhandout { margin-top: .5em; border-radius: 15px;  border-color: #73b0e5; line-height: 1.18; width: 60%; }
+</style>
+<div class="row" style="color:#3e5569;">
+    <div class="col-xs-12" style="background-color:rgb(25,162,230); color:#fff">
+      <h3 class="text-center mtb15"><?=$res['title']?></h3>
+    <?php foreach ($res['desc'] as $txt): ?>
+      <p class="text-left" style="padding-left:20px;"><?=$txt?></p>
+    <?php endforeach; ?>
+    </div>
+    <div class="col-xs-12" style="padding:0">
+      <?php if($res['status']<1):?>
+      <img src="/images/bg_pay_info.jpg" style="width:100%">
+      <?php else:?>
+      <img src="/images/bg_pay_res.jpg" style="width:100%">
+      <?php endif; ?>
+    </div>
+    <div class="col-xs-12 blk">
+        <div class="row">
+          <div class="col-xs-1 col-md-1"></div>
+          <div class="col-xs-10 col-md-1">
+              <ul class='list-group'>
+              <?php if($res['status']>=0):?>
+                <li class="list-group-item-text ordetail">实付金额：￥<?=number_format($res['payment'], 2)?></li>
+              <?php endif; ?>
+                <li class="list-group-item-text ordetail">订单编号：<?=$res['ordersn']?></li>
+              </ul>
+          </div>
+          <div class="col-xs-1 col-md-1"></div>
+        </div>
+    </div>
+
+    <?php if($res['status']>=0):?>
+    <div class="col-xs-12 text-center blk">
+      <button class="btn btn-primary btnhandout" onclick="window.location.href='#'">查看 订单详情</button>
+    </div>
+    <?php endif; ?>
+    <div class="col-xs-12 text-center blk" style="padding:0">
+      <button class="btn btn-info btnhandout" onclick="window.location.href='#'">返回 首页看看</button>
+    </div>
+
+    <div class="col-xs-12 blk">
+      <br><br>
+      <center><img src="/images/troto-slogon.png" style="width: 80%;"></center>
+    </div>
+
+</div>
+
+<?php include '../views/layouts/TrotoWxshare.php';?>

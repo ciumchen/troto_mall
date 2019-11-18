@@ -1,0 +1,285 @@
+{php $newUI = true;}
+{template 'common/header'}
+
+<ol class="breadcrumb" style="padding:5px 0;">
+	<li><a href="{url 'home/welcome/ext'}"><i class="fa fa-cogs"></i> &nbsp; 微商城</a></li>
+	<li>商城功能</li>
+	<li>广告幻灯片管理</li>
+</ol>
+
+<ul class="nav nav-tabs">
+	<li {if $do == 'display' && $operation == 'display'} class="active" {/if}>
+		<a href="{php echo url('shopping/ads', array('m'=>'ewei_shopping'))}">广告幻灯片管理</a>
+	</li>
+	<li {if $do == 'add'} class="active"{/if}>
+		<a href="{php echo url('shopping/ads/add', array('op'=>'handle', 'm'=>'ewei_shopping'))}">{if $adid}修改{else}添加{/if}广告幻灯片</a>
+	</li>
+	{if $do == 'detail' && $operation == 'display'}<li  class="active"><a href="##">广告幻灯片详情</a></li>
+	{/if}
+	<li {if $do == 'address' && $operation == 'handle'} class="active" {/if}>
+		<a href="{php echo url('shopping/ads/address', array('op'=>'handle', 'm'=>'ewei_shopping'))}">
+			{$ptr_title}
+		</a>
+	</li>
+</ul>
+{if $do=='display' && $operation=='display'}
+<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal order-horizontal" role="form" id="form1">
+			<input type="hidden" name="c" value="shopping" />
+			<input type="hidden" name="a" value="ads" />
+			<input type="hidden" name="m" value="ewei_shopping" />
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">广告幻灯片名称</label>
+				<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+					<input class="form-control" name="advname" id="" type="text" value="{$_GPC['advname']}" placeholder="">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">启用状态</label>
+				<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+					<select name="enabled" class="form-control">
+						<option value="">不限</option>
+						<option value="0" {if $_GPC['enabled']=='0'} selected="selected" {/if}>禁用</option>
+						<option value="1" {if $_GPC['enabled']=='1'} selected="selected" {/if}>启用</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">展示有效期</label>
+				<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+					{php echo tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d', $list['param']['starttime']),'endtime'=>date('Y-m-d', $list['param']['endtime'])));}
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">广告类型</label>
+				<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+					<select name="type" class="form-control">
+						<option value="">不限</option>
+						{loop $adsTypeList $key $type}
+						<option value="{$key}" {if isset($_GPC['type']) && $_GPC['type'] != '' && $_GPC['type'] == $key} selected="selected" {/if}>
+							{$type}
+						</option>
+						{/loop}
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">单页查询数量</label>
+				<div class="col-sm-7 col-lg-9 col-xs-12">
+					<select class="form-control" style="margin-right:15px;width:100px;" name="psize" >
+						<option value="10"{if $_GPC['psize']=='10'||!$_GPC['psize']} selected="selected"{/if}>10条</option>
+						<option value="20"{if $_GPC['psize']=='20'} selected="selected"{/if}>20条</option>
+						<option value="30"{if $_GPC['psize']=='30'} selected="selected"{/if}>30条</option>
+						<option value="50"{if $_GPC['psize']=='50'} selected="selected"{/if}>50条</option>
+						<option value="100"{if $_GPC['psize']=='100'} selected="selected"{/if}>100条</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-3 col-lg-2">
+					<button class="btn btn-default">
+						<i class="fa fa-search"></i> 搜索
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	</div>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		广告幻灯片（当前搜索到 <label class="text text-danger">{$list['total']}</label> 条数据）<br>PS. 首页展示使用逆序；&nbsp;&nbsp;&nbsp;只有在展示日期内、且状态为启用的广告幻灯片才会被显示
+	</div>
+	<div class="panel-body table-responsive" >
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th>ID</th>
+					<th>广告幻灯片名称</th>
+					<th>显示顺序</th>
+					<th>广告类型</th>
+					<th style="width:320px;">展示日期(开始时间--结束时间)</th>
+					<th>状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list['list'] $item}
+				<tr class="list" data-sid='{$item["adid"]}' data-state='{$item["status"]}'>
+					<td>{$item['adid']}</td>
+					<td>{$item['advname']}</td>
+					<td>{$item['displayorder']}</td>
+					<td>{php echo getAdsTypeStr($item['type'])}</td>
+					<td>{php echo date('Y-m-d H:i:s', $item['starttime'])} -- {php echo date('Y-m-d H:i:s', $item['endtime'])}</td>
+					<td>
+						{if $item['enabled'] == '1'}
+						<span class="btn btn-success btn-sm">启用</span>
+						{else if $item['enabled'] == '0'}
+						<span class="btn btn-danger btn-sm">禁用</span>
+						{/if}
+					</td>
+					<td>
+						<a class="btn btn-info btn-sm" href="{php echo url('shopping/ads',array('adid'=>$item['adid'],'do'=>'add','op'=>'handle', 'm'=>'ewei_shopping'))}">编辑</a>
+						<a class="btn btn-info btn-sm" href="{php echo url('shopping/ads',array('adid'=>$item['adid'],'do'=>'detail', 'm'=>'ewei_shopping'))}">详情</a>
+					</td>
+				{/loop}
+			</tbody>
+		</table>
+	</div>
+</div>
+{$list['pager']}
+{else if $do=='detail' && $operation=='display'}
+<div class="panel panel-default">
+	<div class="panel-heading">{$op_type}广告幻灯片详情</div>
+	<div class="panel-body">
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-4 control-label">广告幻灯片ID：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailData['adid']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-4 control-label">广告幻灯片名称：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailData['advname']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-4 control-label">启用状态：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{php echo $detailData['enabled']?'启用':'禁用'}</span>
+			</div>
+		</div>
+
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-4 control-label">显示顺序：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailData['displayorder']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-4 control-label">开始时间：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{php echo date('Y-m-d H:i:s', $detailData['starttime'])}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-4 control-label">结束时间：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{php echo date('Y-m-d H:i:s', $detailData['endtime'])}</span>
+			</div>
+		</div>
+
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-4 control-label">广告类型：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{php echo getAdsTypeStr($detailData['type'])}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-4 control-label">跳转链接：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailData['link']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:32%">
+			<label class="col-xs-12 col-md-4 control-label">缩略图：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailData['thumb']}</span>
+			</div>
+		</div>
+	</div>
+</div>
+{else if $operation == 'handle'}
+<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+	<div class="panel panel-default">
+		<div class="panel-heading">{$op_type} 广告幻灯片信息</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">广告幻灯片名称</label>
+				<div class="col-sm-9 col-xs-12">
+					<input  class="form-control" name="advname" value="{$item['advname']}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">启用状态</label>
+				<div class="col-sm-9 col-xs-12">
+					<label for="enabled" class="radio-inline"><input type="radio" name="enabled" value="0" id="enabled" {if empty($item) || $item['enabled'] == 0}checked="true"{/if} /> 禁用</label>
+					&nbsp;&nbsp;&nbsp;
+					<label for="enabled" class="radio-inline"><input type="radio" name="enabled" value="1" id="enabledenabled"  {if !empty($item) && $item['enabled'] == 1}checked="true"{/if} /> 启用</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">展示顺序</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="displayorder" value="{$item['displayorder']}" style="width:85px">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">广告类型</label>
+				<div class="col-sm-9 col-xs-12">
+					<select name="type" class="form-control">
+						{loop $adsTypeList $adk $adv}
+						<option value="{$adk}" {if isset($item['type']) && $item['type'] != '' && $item['type'] == $adk} selected="selected"{/if}>{$adv}
+						</option>
+						{/loop}
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">广告幻灯片链接</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="link" value="{$item['link']}">
+					<span class="help-block"><strong style="color:red">注意: </strong>如果是频道页面，填写频道页面url；否则，请置空</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">广告幻灯片图片</label>
+				<div class="col-sm-9 col-xs-12">
+					{php echo tpl_form_field_image('thumb', $item['thumb'], '', array('extras' => array('text' => 'readonly')))}
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">有效时间</label>
+				<div class="col-sm-4 col-xs-6">{php echo tpl_form_field_date('starttime', !empty($item['starttime']) ? date('Y-m-d H:i',$item['starttime']) : date('Y-m-d H:i'), 1)}</div>
+				<div class="col-sm-4 col-xs-6">{php echo tpl_form_field_date('endtime', !empty($item['endtime']) ? date('Y-m-d H:i',$item['endtime']) : date('Y-m-d H:i', strtotime('+5 days')), 1)}</div>
+			</div>
+			<div class="form-group col-sm-12">
+				<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+	</div>
+</form>
+{/if}
+<script>
+$(function(){
+	var $fetchItem = $('.fetch-item');
+	 $fetchItem.on('change',function(){
+	 	var Item = $(this).children();
+	 	//console.log(Item)
+	 	Item.each(function(){
+	 		if($(this).get(0).selected == true){	
+	 			var this_Id = $(this).val(),
+	 				fetchMobile = $('.fetch-mobile');
+	 			fetchMobile.each(function(){
+	 				var $this = $(this);
+	 				 if($this.attr('data-rol') == this_Id){
+			 				var fetchMobileTxt = $this.val();
+			 				$("#suppliers-mobile").show();
+			 				$this.parent('div').children(":first").val(fetchMobileTxt);
+			 		 }
+	 			})
+	 			if($(this).get(0).index === 0){
+	 					fetchMobile.parent('div').children(":first").val("");
+	 					$("#suppliers-mobile").hide();
+	 			}	
+	 		}
+	 		
+	 	})
+	 })
+})
+</script>
+
+{template 'common/footer'}

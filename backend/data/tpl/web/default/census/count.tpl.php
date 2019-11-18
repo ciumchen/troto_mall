@@ -1,0 +1,346 @@
+<?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 0) ? (include $this->template('common/header', TEMPLATE_INCLUDEPATH)) : (include template('common/header', TEMPLATE_INCLUDEPATH));?>
+<?php  if($do == "display") { ?>
+<style type="text/css">
+	ul {list-style:none;padding:0;margin:0;}
+	.sel-day {
+		display:-webkit-box;
+		display:-webkit-flex;
+		margin:0 12px 10px;
+		border:1px solid #c6c6c6;
+	}
+	.sel-day li {
+		-webkit-box-flex:1;
+		-webkit-flex:1;
+		text-align:center;
+		line-height:32px;
+		cursor:pointer;
+		border-right:1px solid #c6c6c6;
+	}
+	.sel-day li.on {
+		background:#efefef;
+	}
+	.sel-day li:last-child {
+		border-right:none;
+	}
+	.panel-body {
+		position:relative;
+	}
+	.chart p {
+		padding-top:120px;
+	}
+</style>
+ <div class="panel panel-info">
+ 	<div class="panel-heading">筛选</div>
+ 	<div class="panel-body">
+ 	   <form action="./index.php" method="get" class="form-horizontal" role="form">
+ 	   <input type="hidden" name="c" value="census" />
+		<input type="hidden" name="a" value="count" />
+ 		<div class="form-group">
+ 			<label class="col-sm-2 col-md-2 col-lg-2 control-label">用户UID/OPENID</label>
+		    <div class="col-sm-8 col-lg-6"><input type="text" id="search-txt" class="form-control" value="<?php  echo $_GPC['uid'];?>"/></div>
+		    <button type="submit" class="btn btn-default" OnClick="return fromSetVal()"><i class="fa fa-search"></i>&nbsp;指定</button>
+		</div>
+		<input type="hidden" name="uid" id="get-uid" value/>
+	   </form>
+	</div>
+ </div>
+<div class="panel panel-default">
+	<div class="panel-heading">用户商品详情访问统计<a class="btn btn-default" href="<?php  echo url('census/count', array('do' => 'more','op' => 'detail'));?>" style="float:right;margin-top:-7px">查看更多</a></div>
+	<div class="panel-body account-basicinformation">
+		<ul class="sel-day detail-sel-day">
+            <li data-day="1" class="on">1天</li>
+            <li data-day="7">7天</li>
+            <li data-day="30">30天</li>
+        </ul>
+		<div id="myChartDet" style="height:280px;text-align:center"></div>
+	</div>
+</div>
+<div class="panel panel-default">
+	<div class="panel-heading">用户商品搜索统计<a class="btn btn-default" href="<?php  echo url('census/count', array('do' => 'more','op' => 'search'));?>" style="float:right;margin-top:-7px">查看更多</a></div>
+	<div class="panel-body account-basicinformation">
+		<ul class="sel-day search-sel-day">
+            <li data-day="1" class="on">1天</li>
+            <li data-day="7">7天</li>
+            <li data-day="30">30天</li>
+        </ul>
+		<div id="myChartSearch" style="height:280px;text-align:center"></div>
+	</div>
+</div>
+<div class="panel panel-default">
+	<div class="panel-heading">用户商品分类访问统计<a class="btn btn-default" href="<?php  echo url('census/count', array('do' => 'more','op' => 'class'));?>" style="float:right;margin-top:-7px">查看更多</a></div>
+	<div class="panel-body account-basicinformation">
+		<ul class="sel-day class-sel-day">
+            <li data-day="1" class="on">1天</li>
+            <li data-day="7">7天</li>
+            <li data-day="30">30天</li>
+        </ul>
+		<div id="myChartClass" style="height:280px;text-align:center"></div>
+	</div>
+</div>
+<script type="text/javascript" src="./resource/js/zepto.min.js"></script>
+<script type="text/javascript" src="./resource/js/echarts.js"></script>
+<script type="text/javascript">
+	function fromSetVal(){
+		var uid = document.getElementById("get-uid"),
+			fromTxt = document.getElementById("search-txt").value;
+		if(fromTxt != undefined && fromTxt != null){
+			uid.value=fromTxt;
+			return true;
+		}
+
+	}
+
+</script>
+<script>
+	  require(
+            [
+            	'echarts',
+                'echarts/chart/data',
+                'echarts/chart/bar',
+                'echarts/chart/pie'
+            ],
+            function (ec, data, bar, pie) {
+
+            	/*var dataList = data.sendAjax({
+            		chart: obj.myChart,
+					url: obj.chartUrl,
+					data: {type: 'Detail', day: 1},
+					callback: function(data) {
+						setChartBarData(data);
+					}
+            	});*/
+
+                // 用户商品详情访问统计
+                var myChartDet = ec.init(document.getElementById('myChartDet')); 
+                data.barDet({
+                	myChart: myChartDet,
+                	url: location.href, 
+                	btn: $('.detail-sel-day li')
+                });
+                // 用户商品分类访问统计
+                var myChartClass = ec.init(document.getElementById('myChartClass')); 
+                data.pieClass({
+                	myChart: myChartClass, 
+                	url: location.href, 
+                	btn: $('.class-sel-day li')
+                });
+                // 用户商品分类访问统计
+                var myChartSearch = ec.init(document.getElementById('myChartSearch')); 
+                data.barSearch({
+                	myChart: myChartSearch, 
+                	url: location.href, 
+                	btn: $('.search-sel-day li')
+                });
+            }
+        );
+</script>
+<?php  } else if($do == "more") { ?>
+<?php  if($op == 'AloneDetail') { ?>
+	<div class="main">
+		<div class="panel panel-info">
+			<div class="panel-heading">全部详细信息&nbsp;总共<span style="color:red"><?php  echo $res['total'];?></span>条数据</div>
+			<div class="panel-body table-responsive">
+			<table class="table table-hover">
+				<thead>
+						<tr>
+							<th>ID</th>
+							<th>访问类型</th>
+							<th><?php  echo $res['info_mations'];?></th>
+							<th>访问用户UID/OPENID</th>
+						    <th>时间</th>
+						    <th>操作</th>
+						</tr>
+				</thead>
+				<tbody>
+				<?php  if(is_array($res['items'])) { foreach($res['items'] as $rrs) { ?>
+						<tr>
+							<td><?php  echo $rrs['id'];?></td>
+							<td><label class="label label-info"><?php  echo $res['type_name'];?></label></td>
+							<td class="title-tooltip"><label class="label label-success">
+								<?php  if(is_numeric($rrs['searchtxt'])) { ?>
+									<?php  echo $rrs['info_title']['title'];?>
+								<?php  } else { ?>
+									<?php  echo $rrs['searchtxt'];?>
+								<?php  } ?>
+							</label></td>
+							<td><?php  echo $rrs['uid'];?></td>
+						    <td><?php  echo $rrs['createdt'];?></td>
+						    <td><a class="btn btn-default" onclick="javascript:return confirm('是否删除？')" href="<?php  echo url('census/count', array('do' => 'more','op' => 'delete','fromid' => $rrs['id']));?>" data-toggle="tooltip" data-placement="bottom" title="删除"><i class="fa fa-times"></i></a></td>
+						</tr>
+				<?php  } } ?>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<?php  echo $res['pager'];?>
+<?php  } else { ?>
+<style>	
+	.panel-body ul>li a i{right:10px;}
+	.panel-body ul>li a{padding:15px 31px;font-weight: bold;font-size: 15px}
+	.panel-body ul>li{float: left;padding:6px 20px;position: relative;left:33%;}
+	.panel-body ul{list-style-type:none;}
+</style>
+<div class="main">
+	<div class="panel panel-default is-outer-layer">
+		<div class="panel-heading"><?php  echo $title;?>详情表格&nbsp;总共<span style="color:red" id="total-age"><?php  echo $res['total'];?></span>条记录<a class="btn btn-default" href="javascript:;" style="float:right;margin-top:-7px" onclick="javascript:history.back()">返回上一级</a></div>
+		<div class="panel-body table-responsive">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>访问类型</th>
+						<th><?php  echo $info_title;?></th>
+						<th>访问用户UID/OPENID</th>
+						<th>时间</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+				<?php  if(is_array($res['list'])) { foreach($res['list'] as $ss) { ?>
+					<tr class="upd-times">
+						<td><?php  echo $ss['id'];?></td>
+						<td><label class="label label-info"><?php  echo $ss['type_name'];?></label></td>
+						<td class="title-tooltip"><label class="label label-success"><?php  echo $ss['info_title']['title'];?></label></td>
+						<td><?php  echo $ss['uid'];?></td>
+						<td><?php  echo date("Y-m-d H:i:s",$ss['createdt']);?></td>
+						<td><a class="btn btn-default" onclick="javascript:return confirm('是否删除？')" href="<?php  echo url('census/count', array('do' => 'more','op' => 'delete','fromid' => $ss['id']));?>" data-toggle="tooltip" data-placement="bottom" title="删除"><i class="fa fa-times"></i></a></td>
+					</tr>
+				<?php  } } ?>
+				</tbody>
+		</table>
+		<div class="panel-body" style="text-align:center">
+			<a class="btn btn-default" id="open-time" href="javascript:void(0);" data-toggle="tooltip" data-placement="bottom" title="展开时间筛选" style="width:25%;height:35px"><i class="glyphicon glyphicon-fullscreen"></i></a>
+		</div>
+		<div class="panel-body" style="text-align: center;display:none" id="from-time">
+				<ul>
+						<li><a class="btn btn-default" href="javascript:void(0);" btotalAge='1' btypeMes="<?php  echo $op;?>"><i class="glyphicon glyphicon-time"></i>1天</a></li>
+						<li><a class="btn btn-default" href="javascript:void(0);" btotalAge='7'><i class="glyphicon glyphicon-time"></i>7天</a></li>
+						<li><a class="btn btn-default" href="javascript:void(0);" btotalAge='30'><i class="glyphicon glyphicon-time"></i>30天</a></li>
+						<div style="clear:both"></div>
+				</ul>
+		</div>	
+		<div style="display:none" id="Alone-detail">	
+			<form id="action-form" method='get' action="./index.php">
+			  <input type="hidden" name="c" value="census" />
+			  <input type="hidden" name="a" value="count" />
+			  <input type="hidden" name="do" value="more" />
+			  <input type="hidden" name="op" value="AloneDetail" />
+			  <input type="hidden" name="date_time" value="" class="date-time"/>
+			  <button class="btn btn-default" data-toggle="tooltip" data-placement="bottom" title="全部信息" id="select-alone">查看全部信息</button>
+			</form>
+		</div>	
+	</div>
+</div>
+<?php  echo $res['pager'];?>
+<div id="alpha-div" style="width:100%;height:100%;background-color:black;position:absolute;top:0%;left:0%;z-index:9999;opacity:0.5;filter: alpha(opacity=0.7);-webkit-opacity:0.5;display:none"><span style='position:relative;top:50%;left:50%;color:#fff;font-size:1.2em'>加载中. . .</span></div>
+<script>
+	window.onload = function(){
+		var btn = document.getElementById('open-time');
+		btn.onclick = function(e){
+			$("#from-time").slideToggle('slow');
+		}
+	}
+
+	$(function(){
+
+		var alpha = {
+			_isalphamsc : function(lk){
+				if(lk){
+					$('#alpha-div').show();
+				} else {
+					$('#alpha-div').hide();
+				}
+				
+			}
+		}
+
+		$("#from-time ul > li").click(function(){
+			var _self = $(this),
+				list = [];
+				_self.each(function(){
+					var _self_this = $(this);
+						_self_this.children().css({'background-color':'#ccc'})
+						_self_this.siblings().each(function(){
+							var _self_this_each = $(this)
+								_self_this_each.children('a').css({'background-color':'#fff'})
+						})
+					var tAge = _self.children('a').attr('btotalAge'),
+						tType = _self.parent().children('li:eq(0)').children('a').attr('btypeMes');
+					list.push(tAge,tType);
+				});
+
+				if(list != undefined && list instanceof Array == true){
+						alpha._isalphamsc(1);
+						goTimes(list);
+				}
+		});
+
+		var goTimes = function(listData){
+			//console.log(listData);return;
+			$.ajax({
+				type : 'get',
+				url : window.location,
+				data : {times : listData},
+				dataType : 'json',
+				success : function(ethis){
+						var items = ethis.items,
+							html = '';
+					alpha._isalphamsc(0);
+					console.log(ethis)
+					if(items.length == 0){
+						$('.table-hover thead').next('tbody').html('<tr><td colspan="6" style="text-align:center"><h3>暂无数据！</h3></td></tr>');
+					} else {
+						for (var k=0,klen=items.length;k<klen;k++){
+							var itemst = items[k],
+								title = isNaN(itemst.searchtxt) ? itemst.searchtxt : itemst.info_title.title;
+						
+								html += '<tr class="upd-times"><td>'+itemst.id+'</td><td><label class="label label-info">'+ethis.type_name+'</label></td>\
+										<td class="title-tooltip"><label class="label label-success">'+title+'</label></td>\
+										<td>'+itemst.uid+'</td>\
+										<td>'+itemst.createdt+'</td>\
+										<td><a class="btn btn-default" onclick="javascript:return confirm("是否删除？"")" href="<?php  echo url("census/count", array("do" => "more","op" => "delete","fromid" => '+itemst.id+'));?>" data-toggle="tooltip" data-placement="bottom" title="删除"><i class="fa fa-times"></i></a><td></tr>\
+										'
+						}
+
+						$('.table-hover thead').next('tbody').html(html);
+			
+					}
+					$('#total-age').text(ethis.total)
+					$('.is-outer-layer').next('div').remove();
+					$("#Alone-detail").show();
+					FlipPagerIn(listData);
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown){
+						console.debug(XMLHttpRequest.status);
+						console.error(XMLHttpRequest.readyState);
+						console.info(textStatus);
+				}
+			})
+		}
+
+		var FlipPagerIn = function(Flipr){
+				$('.date-time').val(Flipr);
+				$('#select-alone').click(function(){
+					$('#action-form').submit();
+				})
+		}		
+	});
+</script>
+<?php  } ?>
+<?php  } ?>
+<script>
+	require(['bootstrap'],function($){
+			$("a").hover(function(){
+				$(this).tooltip('show');
+			},function(){
+				$(this).tooltip('hide');
+			})
+			$("button").hover(function(){
+				$(this).tooltip('show');
+			},function(){
+				$(this).tooltip('hide');
+			})
+		});
+
+</script>
+<?php (!empty($this) && $this instanceof WeModuleSite || 0) ? (include $this->template('common/footer', TEMPLATE_INCLUDEPATH)) : (include template('common/footer', TEMPLATE_INCLUDEPATH));?> 

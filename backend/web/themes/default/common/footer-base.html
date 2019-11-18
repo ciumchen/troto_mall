@@ -1,0 +1,12 @@
+	<script>require(['bootstrap']);</script>
+	<div class="container-fluid footer" role="footer">
+		<div class="page-header"></div>
+		<span class="pull-left">
+			<p>{if empty($_W['setting']['copyright']['footerleft'])} <b>{$_W['config']['site']['name']}</b>  &copy; {php echo date('Y')} {else}{$_W['setting']['copyright']['footerleft']}{/if}</p>
+		</span>
+		<!-- <span class="pull-right">
+			<p>{if empty($_W['setting']['copyright']['footerright'])}<a href="http://www.we7.cc">关于微擎</a><a href="http://bbs.we7.cc">微擎帮助</a>{else}{$_W['setting']['copyright']['footerright']}{/if}{if !empty($_W['setting']['copyright']['statcode'])}&nbsp; &nbsp; {$_W['setting']['copyright']['statcode']}{/if}</p>
+		</span> -->
+	</div>
+</body>
+</html>

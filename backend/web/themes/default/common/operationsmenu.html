@@ -1,0 +1,6 @@
+<ul class="nav nav-tabs">
+	<li {if $do == 'operations' && $operation == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('operations', array('op' => 'display'))}">概要</a></li>
+	<li {if $do == 'SigninGoods' && $operation == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('SigninGoods', array('op' => 'display'))}">签到产品</a></li>
+	<li {if $do == 'redpacket' && $operation == 'display'}class="active"{/if}><a href="{php echo $this->createWebUrl('redpacket', array('op' => 'display'))}">红包活动</a></li>
+	<li {if $operation == 'inserOrder'}class="active"{/if}><a href="{php echo $this->createWebUrl('operations', array('op' => 'inserOrder'))}">手工订单</a></li>
+</ul>

@@ -1,0 +1,52 @@
+<?php
+return [
+    'site_name' => '多轮多微服务',
+    'site_keywords' => '自助购胎,多轮多微服务,智慧新零售服务',
+    'site_descript' => '多轮多微服务，致力于打造便捷、高性价比的自助购买、换胎服务平台。',
+    'admin_mail' => 'fw@troto.com.cn',
+    'notify_mail' => [
+        'host' => 'smtp.qq.com',
+        'port' => '25',
+        'user' => 'noreply@10d15.com',
+        'pwd' => '1234567',
+        'name' => '十点一刻海淘生活馆通知',
+    ],
+    'static_cdn_url' => 'http://cdn.10d15.com',
+    'firstOrderDiscount' => [
+        'startTime' => '2016-07-29 00:00:00',
+        'endTime' => '2016-07-31 23:59:59',
+        'day1' => 20,
+        'day2' => 15,
+        'day3' => 10
+    ],
+    'ImageType' => ["image/jpeg", "image/png", "image/jpg"],
+    'register_gift_coupon' => [1, 2, 3],  //用户注册，赠送10元、20元、50元面额的优惠券，各一张。
+    'free_deliver_coupon' => [
+        'values' => [
+            ['type_id' => 1, 'total' => 20],
+            ['type_id' => 2, 'total' => 20],
+            ['type_id' => 3, 'total' => 20],
+            ['type_id' => 4, 'total' => 20]
+        ],
+        'once_per_days' => 1 //领取间隔天数
+    ],
+
+    /** 优惠券领取设置（配置参数如下）
+     * typeid指数据库中优惠券类型id，
+     * dayLimit指活动开启期间单日单用户领取数量限制,
+     * allLimit指活动开启期间单用户领取数量限制,
+     */
+    'coupon_setting' => [
+        'openDt'  => '2016-09-20 10:00:00',
+        'closeDt' => '2016-11-20 10:00:00',
+        'list'    => [
+            8 => ['typeid'=>8, 'dayLimit'=>1, 'allLimit'=>1],
+            3 => ['typeid'=>3, 'dayLimit'=>1, 'allLimit'=>10],
+            4 => ['typeid'=>4, 'dayLimit'=>1, 'allLimit'=>10],
+        ],
+    ],
+];
+
+# Yii::$app->params['site_name']
+# Yii::$app->params['admin_mail']
+# Yii::$app->params['static_cdn_url']

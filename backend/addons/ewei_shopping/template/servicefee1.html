@@ -1,0 +1,207 @@
+{template 'common/header'}
+{template 'common'}
+<ul class="nav nav-tabs">
+	<li {if $operation == 'display'} class="active" {/if}><a href="{php echo $this->createWebUrl('servicefee',array('op' =>'display'))}">费用列表</a></li>
+	<li{if $operation == 'post'} && empty($servicefee['id'])} class="active" {/if}><a href="{php echo $this->createWebUrl('servicefee',array('op' =>'post'))}">添加地区</a></li>
+	{if !empty($servicefee['id']) && $operation== 'post'} <li class="active"><a href="{php echo $this->createWebUrl('servicefee',array('op' =>'post','id'=>$servicefee['id']))}">编辑记录</a></li> {/if}
+</ul>
+
+{if $operation == 'display'}
+
+<div class="main panel panel-default">
+	<div class="panel-heading">
+		服务费记录（当前搜索到 <label class="text text-danger">{$total}</label> 条数据）
+	</div>
+	<div class="panel-body table-responsive">
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+			<tr>
+				<th style="width:80px;">省</th>
+				<th style="width:80px;">市</th>
+				<th style="width:150px;">区</th>
+				<th style="width:100px;">状态</th>
+				<th style="width:100px;">费用</th>
+				<th style="width:150px;">操    作</th>
+			</tr>
+			</thead>
+			<tbody>
+			{loop $list $item}
+			<tr>
+				<td>{$item['prov']}</option></td>
+				<td>{$item['city']}</option></td>
+				<td>{$item['dist']}</td>
+				<td>
+					<?php if ($item['status'] == 0){?>
+					<label class="label label-success">未开放</label>
+					<?php }?>
+					<?php if ($item['status'] == 1){?>
+					<label class="label label-default">已开放</label>
+					<?php }?>
+				</td>
+				<td>{$item['fee']}</td>
+				<td style="text-align:left;">
+					<a href="{php echo $this->createWebUrl('servicefee', array('op' => 'post', 'id' => $item['regionid']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="修改"><i class="fa fa-pencil"></i></a>
+					<a href="{php echo $this->createWebUrl('servicefee', array('op' => 'delete', 'id' => $item['regionid']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="删除" "><i class="fa fa-times"></i></a>
+				</td>
+			</tr>
+			{/loop}
+			</tbody>
+		</table>
+		{$pager}
+	</div>
+</div>
+<script>
+	require(['bootstrap'],function($){
+		$('.btn').hover(function(){
+			$(this).tooltip('show');
+		},function(){
+			$(this).tooltip('hide');
+		});
+	});
+</script>
+{elseif $operation == 'post'}
+
+<div class="main">
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+		<!--<input type="hidden" name="cabinetid" value="{$cabinet['cabinetid']}" />-->
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				地区详细设置
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>地区状态</label>
+					<div class="col-sm-9 col-xs-12">
+						<select name="status" class='form-control'>
+							<option value="0" {if empty($regions['status'])} selected{/if}>未开放</option>
+							<option value="1" {if !empty($regions['status'])} selected{/if}>已开放</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>服务地址</label>
+					<div class="col-xs-4 col-md-3 col-sm-3 col-lg-2">
+						<select class="form-control input-medium" id="provItems"><option >{$regions['prov']}</option></select>
+					</div>
+					<div class="col-xs-4 col-md-3 col-sm-3 col-lg-2">
+						<select class="form-control input-medium" id="cityItems"><option >{$regions['city']}</option></select>
+					</div>
+					<div class="col-xs-4 col-md-3 col-sm-3 col-lg-2">
+						<select class="form-control input-medium" id="distItems"><option >{$regions['dist']}</option></select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">服务金额</label>
+					<div class="col-sm-9 col-xs-12">
+						<div class="input-group">
+							<span class="input-group-addon">¥</span>
+							<input type="text" name="fee" class="form-control" value="{$regions['fee']}">
+							<span class="input-group-addon">元/每次</span>
+						</div>
+						<div style="margin-top: 8px;">
+							<strong style="color:red">提示: </strong><span>未添加的区域默认为上级区域的金额</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-xs-4">
+				<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-4"  />
+			</div>
+			<div class="col-xs-4">
+				<input type="button" value="取消" class="btn btn-success col-lg-4"  onclick="location='{php echo $this->createWebUrl('servicefee',array('op' =>'display'))}'"/>
+			</div>
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+	</form>
+</div>
+
+<script>
+$(document).ready(function(){
+  $.getJSON('./index.php?c=site&a=entry&op=post&parentid=0&do=AjaxCityData&m=ewei_shopping',function(res){
+    $.each(res.data, function(i, area){
+		$("#provItems").append('<option value="'+area['regionid']+'">'+area['name']+'</option>');
+    });
+  });
+
+  $("#provItems").change(function(){
+  		$("#cityItems").html('')
+	  $.getJSON('./index.php?c=site&a=entry&op=post&parentid='+$("#provItems").val()+'&do=AjaxCityData&m=ewei_shopping',function(res){
+	    $.each(res.data, function(i, area){
+			$("#cityItems").append('<option value="'+area['regionid']+'">'+area['name']+'</option>');
+	    });
+	  });
+
+  });
+
+  $("#cityItems").change(function(){
+  		$("#distItems").html('')
+	    $.getJSON('./index.php?c=site&a=entry&op=post&parentid='+$("#cityItems").val()+'&do=AjaxCityData&m=ewei_shopping',function(res){
+	    $.each(res.data, function(i, area){
+			$("#distItems").append('<option value="'+area['regionid']+'">'+area['name']+'</option>');
+	    });
+	  });
+
+  });
+
+});
+</script>
+
+<script>
+	$(document).ready(function(){
+		$.getJSON('./index.php?c=site&a=entry&op=post&pcate=0&do=AjaxGoodsData&m=ewei_shopping',function(res){
+			$.each(res.data, function(i, area){
+				$("#pcateItems").append('<option value="'+area['pcate']+'">'+area['title']+'</option>');
+			});
+		});
+
+		$("#pcateItems").change(function(){
+			$("#goodsid").html('')
+			$.getJSON('./index.php?c=site&a=entry&op=post&pcate='+$("#pcate").val()+'&do=AjaxGoodsData&m=ewei_shopping',function(res){
+				$.each(res.data, function(i, area){
+					$("#goodsid").append('<option value="'+area['id']+'">'+area['title']+'</option>');
+				});
+			});
+		});
+	});
+</script>
+
+<!--文件上传-->
+{elseif $operation == 'option'}
+
+<script>
+	require(['bootstrap'],function($){
+		$('.btn').hover(function(){
+			$(this).tooltip('show');
+		},function(){
+			$(this).tooltip('hide');
+		});
+	});
+</script>
+
+<script language='javascript'>
+	function formcheck(){
+		console.log(serialize(this));
+		return false;
+		if($("#cabinet_com").isEmpty()){
+			Tip.focus("cabinet_com","请选择地区状态!");
+			return false;
+		}
+		return true;
+	}
+
+	$(function(){
+		$("#common_corp").change(function(){
+			var obj = $(this);
+			var sel =obj.find("option:selected");
+			$("#cabinet_com").val(sel.attr("status"));
+		});
+		{if !empty($cabinet['cabinetid'])}
+		$("#common_corp").val(  "{$cabinet['cabinet_url']}");
+		{/if}
+
+		})
+</script>
+{/if}
+{template 'common/footer'}

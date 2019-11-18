@@ -1,0 +1,190 @@
+{php $newUI = true;}
+{template 'common/header'}
+
+<ol class="breadcrumb" style="padding:5px 0;">
+	<li><a href="{url 'home/welcome/ext'}"><i class="fa fa-cogs"></i> &nbsp; {$module_types}</a></li>
+	<li><a href="{url 'home/welcome/ext' array('m' => $module['name'])}">{$module}</a></li>
+</ol>
+{template 'common/suppliers-nav'}
+{if $operation == 'display'}
+<div class="panel panel-default">
+	<div class="panel-body table-responsive" >
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th>ID</th>
+					<th>联系人</th>
+					<th>公司</th>
+					<th>电话</th>
+					<th>手机</th>
+					<th>状态</th>
+					<th>邮箱</th>
+					<th>QQ</th>
+					<th>网站</th>
+					<th width=200>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list $item}
+				<tr class="list" data-sid='{$item["sid"]}' data-state='{$item["status"]}'>
+					<td class="redpacket-cid">{$item['sid']}</td>
+					<td>{$item['linkman']}</td>
+					<td>{$item['company']}</td>
+					<td>{$item['tel']}</td>
+					<td>{$item['mobile']}</td>
+					<td >
+						{if $item['status'] == '1'}
+						<span class="btn btn-success btn-sm btn-contry on">正常</span>
+						{else if $item['status'] == '0'}
+						<span class="btn btn-danger btn-sm btn-contry">禁用</span>
+						{/if}
+					</td>
+					<td>{$item['email']}</td>
+					<td>{$item['qq']}</td>
+					<td>{$item['site']}</td>
+					<td>
+						<a class="btn btn-info btn-sm" href="{php echo url('ma/suppliers/address',array('sid'=>$item['sid']))}">地址</a>
+						<a class="btn btn-info btn-sm" href="{php echo url('ma/suppliers/suppliers',array('sid'=>$item['sid'], 'op' => 'handle'))}">编辑</a>
+					</td>
+				{/loop}
+			</tbody>
+		</table>
+	</div>
+</div>
+{$pager}
+{else if $operation == 'handle'}
+{if $id}
+<div class="panel panel-default">
+	<div class="panel-heading">供应商信息</div>
+	<div class="panel-body">
+		<div class="form-group" style="float:left;width:30%">
+			<label style="width:90px" class="ol-xs-5 col-md-3 control-label">公司：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $item['company'] == ""}无{else}{$item['company']}{/if}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:30%">
+			<label style="width:90px" class="ol-xs-5 col-md-3 control-label">联系人：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $item['linkman'] == ""}无{else}{$item['linkman']}{/if}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:30%">
+			<label style="width:90px" class="ol-xs-5 col-md-3 control-label">手机：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $item['mobile'] == ""}无{else}{$item['mobile']}{/if}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:30%">
+			<label style="width:90px" class="ol-xs-5 col-md-3 control-label">电话：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $item['tel'] == ""}无{else}{$item['tel']}{/if}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:30%">
+			<label style="width:90px" class="ol-xs-5 col-md-3 control-label">邮箱：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $item['email'] == ""}无{else}{$item['email']}{/if}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:30%">
+			<label style="width:90px" class="ol-xs-5 col-md-3 control-label">QQ：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $item['qq'] == ""}无{else}{$item['qq']}{/if}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:30%">
+			<label style="width:90px" class="ol-xs-5 col-md-3 control-label">主页：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $item['site'] == ""}无{else}{$item['site']}{/if}</span>
+			</div>
+		</div>
+	</div>
+</div>
+{/if}
+<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			{$ptr_title}
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">公司：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input  class="form-control" name="company" value="{$item['company']}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">联系人：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="linkman" value="{$item['linkman']}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">手机：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="mobile" value="{$item['mobile']}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">电话：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="tel" value="{$item['tel']}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">邮箱：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="email" value="{$item['email']}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">QQ：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="qq" value="{$item['qq']}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">主页：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="site" value="{$item['site']}">
+				</div>
+			</div>
+			<div class="form-group col-sm-12">
+				<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+				<input type="hidden" name="said" value="{$item['said']}">
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+	</div>
+</form>
+{/if}
+<script>
+	var $start = $('.btn-contry'),
+			cid, type, url;
+		$start.on('click',function(){
+			var $this = $(this);
+			type = ($this.hasClass('on')) ? 1 : 0;  //1 正常状态 0 禁用状态
+			sid = $this.parents('tr').find('.redpacket-cid').text();
+			$.ajax({
+				type: 'post',
+				url: location.href,
+				data: {sid: sid, type: type},
+				dataType:'json',
+				success: function(data) {
+					console.log(data)
+					if (data.status == 200) {
+						if (data.type == 1) {
+							$this.text('正常').addClass('on').removeClass('btn-danger');
+						} else {
+							$this.text('禁用').removeClass('on').addClass('btn-danger');
+						}
+					} else {
+						alert(data.msc);
+					}
+				}
+			});
+		});
+</script>
+
+{template 'common/footer'}

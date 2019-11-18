@@ -1,0 +1,46 @@
+<table class="table table-hover row" style="">
+	<thead>
+	<tr class="">
+		<th width="50">轨号</th>
+		<th width="110">轨道状态</th>
+		<th width="110">轮胎售价</th>
+		<th width="60">库存</th>
+		<th>轨道轮胎</th>
+		<th width="170">轮胎编码</th>
+	</tr>
+	</thead>
+	<tbody id="param-items">
+		{loop $cabinetPathwayList $p}
+		<tr>
+			<td>
+				<input name="pathwayid[]" type="hidden" class="form-control param_title" value="{$p['pathwayid']}"/>
+				<input name="pathway[]" type="text" class="form-control param_title" value="{$p['pathway']}" readonly="readonly" />
+			</td>
+			<td>
+				<select name="status[]" class='form-control pathway-status'>
+					<option value="1"{if $p['status']==1} selected="selected"{/if}>启用</option>
+					<option value="0"{if $p['status']==0} selected="selected"{/if}>未启用</option>
+					<option value="-1"{if $p['status']==-1} selected="selected"{/if}>维护</option>
+				</select>
+			</td>
+			<td><input name="price[]" type="text" class="form-control param_value" value="{$p['price']}"/></td>
+			<td><input name="stock[]" type="text" class="form-control" value="{$p['stock']}"/></td>
+			<td>
+				<select name="goodsid[]" class="pathway-goodsid" style="margin-right:15px; width:100%; height:35px;">
+					<option value="0">请选择轨道绑定的商品</option>
+					{loop $goodsList $row}
+						<option value="{$row['id']}" {if $row['id']==$p['goodsid']} selected="selected"{/if}>【{$parentCateList[$row['pcate']]['name']} - {$row['brand']}】 {$row['title']}</option>
+					{/loop}
+				</select>
+			</td>
+			<td><input name="productsn[]" type="text" class="form-control param_value" value="{$p['productsn']}"/></td>
+		</tr>
+		{/loop}
+	</tbody>
+</table>
+<span class="help-block">提示：机柜大区位置需要修改直接找技术人员；轨道库存系统自动维护，人工更新请先确保数据准确对接</span>
+
+<script>
+$('.pathway-status').select2();
+$('.pathway-goodsid').select2();
+</script>

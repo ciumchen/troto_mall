@@ -1,0 +1,51 @@
+{if $_GPC['do'] == 'orderexpress'}
+
+{else if $_GPC['do'] != 'shoppingcard'}
+<ul class="nav nav-tabs">
+	<li {if $do == 'operations' && $operation == 'display'}class="active"{/if}>
+		<a href="{php echo $this->createWebUrl('operations', array('op' => 'display'))}">
+			概要
+		</a>
+	</li>
+	<li {if $do == 'SigninGoods' && $operation == 'display'}class="active"{/if}>
+		<a href="{php echo $this->createWebUrl('SigninGoods', array('op' => 'display'))}">
+			签到产品
+		</a>
+	</li>
+	<li {if $do == 'redpacket' && $operation == 'display'}class="active"{/if}>
+		<a href="{php echo $this->createWebUrl('redpacket', array('op' => 'display'))}">
+			群红包
+		</a>
+	</li>
+	{if $do == 'redpacket' && $operation == 'add'}
+	<li {if $operation == 'add'}class="active"{/if}>
+		<a href="{php echo $this->createWebUrl('redpacket', array('op' => 'add'))}">
+			红包{if $id != ''}修改{else}新增{/if}
+		</a>
+	</li>
+	{/if}
+	<li {if $operation == 'inserOrder'}class="active"{/if}>
+		<a href="{php echo $this->createWebUrl('operations', array('op' => 'inserOrder'))}">
+			手工订单
+		</a>
+	</li>
+</ul>	
+{else}
+<ul class="nav nav-tabs">
+	<li {if $operation == 'display' || $operation == 'binding' || $operation == 'uploadImg'}class="active"{/if}>
+		<a href="{php echo $this->createWebUrl('shoppingcard', array('op' => 'display'))}">
+			概要
+		</a>
+	</li>
+	<li {if $operation == 'add'}class="active"{/if}>
+		<a href="{php echo $this->createWebUrl('shoppingcard', array('op' => 'add'))}">
+			批量新增
+		</a>
+	</li>
+	<li {if $operation == 'batch'}class="active"{/if}>
+		<a href="{php echo $this->createWebUrl('shoppingcard', array('op' => 'batch'))}">
+			批量激活
+		</a>
+	</li>
+</ul>	
+{/if}

@@ -1,0 +1,605 @@
+{template 'common/header'}
+{template 'common'}
+{template 'operationsmenu'}
+
+<div class="main">
+{if $operation == 'display'}
+<p class="text-danger">
+	&nbsp;&nbsp;&nbsp;&nbsp;“启动” 功能：用户开启该购物券的正常模式，即激活卡券以及领取金额等功能；<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;“激活” 功能：用于协助用户绑定优惠券的归属人；<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;“绑定广告图” 功能：用于给绑定的人所拥有的优惠券的页面绑定广告图；
+</p>
+<div class="add-card">
+	Execl导出(用于打印导出)：
+	{loop $moneylist $v}
+	<a href="{php echo $this->createWebUrl('shoppingcard', array('op' => 'exportCard', 'price' => $v))}" class="btn btn-primary">{$v} 元</a>
+	{/loop}
+	<!-- <a href="{php echo $this->createWebUrl('shoppingcard', array('op' => 'exportCard', 'price' => 200))}" class="btn btn-primary">200 元</a>
+	<a href="{php echo $this->createWebUrl('shoppingcard', array('op' => 'exportCard', 'price' => 500))}" class="btn btn-primary">500 元</a>
+	<a href="{php echo $this->createWebUrl('shoppingcard', array('op' => 'exportCard', 'price' => 1000))}" class="btn btn-primary">1000 元</a>
+	<a href="{php echo $this->createWebUrl('shoppingcard', array('op' => 'exportCard', 'price' => 2000))}" class="btn btn-primary">2000 元</a>
+	<a href="{php echo $this->createWebUrl('shoppingcard', array('op' => 'exportCard', 'price' => 5000))}" class="btn btn-primary">5000 元</a> -->
+</div>
+<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+		<div class="panel-body">
+			<form action="./index.php" method="get" class="form-horizontal order-horizontal" role="form" id="form1">
+				<input type="hidden" name="c" value="site" />
+				<input type="hidden" name="a" value="entry" />
+				<input type="hidden" name="m" value="ewei_shopping" />
+				<input type="hidden" name="do" value="shoppingcard" />
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">购物卡ID</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="cid" id="" type="text" value="{$_GPC['cid']}" placeholder="可查询购物卡ID">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">标示</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="token" id="" type="text" value="{$_GPC['token']}" placeholder="可查询标示">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">面额</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="price" id="" type="text" value="{$_GPC['price']}" placeholder="可查询面额">
+					</div>
+				</div> 
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">激活状态</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<select name="activation" class="form-control">
+							<option value="">不限</option>
+							<option value="1" {if $_GPC['activation'] == '1'}selected{/if}>激活</option>
+							<option value="0" {if $_GPC['activation'] === '0'}selected{/if}>未激活</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">使用状态</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<select name="use" class="form-control">
+							<option value="">不限</option>
+							<option value="0" {if $_GPC['use'] == '1'}selected{/if}>未使用</option>
+							<option value="1" {if $_GPC['use'] === '0'}selected{/if}>已使用</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">用户UID</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="uid" id="" type="text" value="{$_GPC['uid']}" placeholder="可查询用户UID">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">领取人UID</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="receiptor" id="" type="text" value="{$_GPC['receiptor']}" placeholder="可查询领取人UID">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">激活码</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="activation_token" id="" type="text" value="{$_GPC['activation_token']}" placeholder="可查询激活码">
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">领取码</label>
+					<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+						<input class="form-control" name="use_token" id="" type="text" value="{$_GPC['use_token']}" placeholder="可查询领取码">
+					</div>
+				</div>
+				<div class="col-sm-3 col-lg-2">
+						<button class="btn btn-default">
+							<i class="fa fa-search"></i> 搜索
+						</button>
+					</div>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="panel-body table-responsive">
+	<table class="table table-hover">
+		<thead class="navbar-inner">
+			<tr>
+				<th width=80><input type="checkbox" class="check-all" style="display:none"/>ID</th>
+				<th width=350>标示</th>
+				<th width=60>面额</th>
+				<th width=60>激活</th>
+				<th width=160>激活时间</th>
+				<th width=60>使用</th>
+				<th width=160>使用时间</th>
+				<th width=60>UID</th>
+				<th>绑定人</th>
+				<th>领取人UID</th>
+				<th width=250>操作</th>
+			</tr>
+		</thead>
+		<tbody class="redpacket-list">
+			{loop $res['list'] $item}
+				<tr>
+					<td class="redpacket-cid">
+					{if $item['activation'] == 0}
+						<input type="checkbox" name="batch-binding-box" class="by-check-all" style="display:none" value="{$item['cid']}"/>
+					{else}
+						<input type="checkbox" name="batch-binding-box" style="display:none" disabled="disabled"/>
+					{/if}
+						{$item['cid']}
+					</td>
+					<td>{$item['token']}</td>
+					<td>{$item['price']}</td>
+					<td>{php echo $item['activation'] ? '是':'否';}</td>
+					<td>{php echo $item['activation'] ? date('Y-m-d H:i:d',$item['activationtime']):'未激活';}</td>
+					<td>{php echo $item['use'] ? '是':'否';}</td>
+					<td>{php echo $item['use'] ? date('Y-m-d H:i:d',$item['usetime']):'未使用';}</td>
+					<td>{if $item['uid'] == 0}{else}<a href="{php echo url('mc/member/post', array('uid' => $item['uid']))}">{$item['uid']}</a>{/if}</td>
+					<td>{$item['nickname']}</td>
+					<td><a href="{php echo url('mc/member/post', array('uid' => $item['receiptor']))}">{$item['receiptor']}</a></td>
+					<td>
+						{if $item['activation'] == 0}
+							<button class="btn btn-info btn-sm so-activate">激活</button>
+						{else}
+							<button class="btn btn-danger btn-sm so-activate-out">取消激活</button>
+						{/if}
+							<input type="hidden" class="binding-url" data-url-name="{php echo $this->createWebUrl('shoppingcard', array('op' => 'binding','cid' => $item['cid']))}" /> 
+						{if $item['status'] == 0}
+							<button class="btn btn-info btn-sm btn-start" data-toggle="tooltip" data-placement="bottom" title="启动后可进行正常激活">启动</button>
+						{else}
+							<button class="btn btn-info btn-sm btn-start btn-danger on" data-toggle="tooltip" data-placement="bottom" title="启动后可进行正常激活">关闭</button>
+						{/if}
+							<input type="hidden" class="get-url" data-url-name="{php echo $this->createWebUrl('shoppingcard', array('op' => 'setStatic'))}" /> 
+						<a href="{php echo $this->createWebUrl('shoppingcard', array('op' => 'uploadImg','cid'=>$item[cid]))}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="绑定广告图">绑定广告图</a>
+					</td>
+				</tr>
+			{/loop}
+			<tr>
+				<td colspan="10">
+					<input type="button" class="btn btn-primary transfer-batch-binding" value="进入批量激活"/>
+					&nbsp;&nbsp;&nbsp;&nbsp;
+					<button class="btn btn-primary batch-binding-btn" style="display:none">批量激活</button>
+					<input type="hidden" data-url-name="{php echo $this->createWebUrl('shoppingcard', array('op' => 'binding', 'type' => 2))}" class="betch-name-url"/>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	{$res['pager']}
+</div>
+{else if $operation == 'add'}
+<p class="text-danger">
+	注：为此购物卡生成，记得填写生成的数量和选择面额
+</p>
+<br>
+<div class="add-card">
+	<p><label class="control-label" for="">卡券数量：</label><input type="number" class="form-control ticket-num" /><span>张(请输入数字)</span></p>
+	<p>
+		<label class="control-label" for="">卡券金额：</label>
+		<?php foreach($moneylist as $k => $v):?>
+		<button type="button" class="btn add-card-money {if $k == 0}on{/if}" data-money="{$v}">{$v}元</button>
+		<?php endforeach;?>
+	</p>
+	<p>
+		<input type="button" class="btn btn-primary add-card-submit" value="提 交" />
+	</p>
+</div>
+<div class="loading">
+	<span>数据处理中，请稍后...</span>
+</div>
+{else if $operation == 'binding'}
+<p class="text-danger">
+	激活信息
+</p>
+<div class="panel-body table-responsive">
+	<table class="table table-hover">
+		<tbody class="navbar-inner">
+			<tr>
+				<td width="208">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">ID</label>
+				</td>
+				<td>
+					<input type="text" class="form-control that-cid" placeholder="{$cid}" readonly="readonly" style="width:108px"/>
+				</td>
+			</tr>
+			<tr>
+				<td width="100">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">标示</label>
+				</td>
+				<td>
+					<input type="text" class="form-control" placeholder="{$res['token']}" readonly="readonly" style="width:368px"/>
+				</td>
+			</tr>
+			<tr>
+				<td width="100">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">面额</label>
+				</td>
+				<td>
+					<input type="text" class="form-control" placeholder="{$res['price']}" readonly="readonly" style="width:108px"/>
+				</td>
+			</tr>
+			<tr>
+				<td width="100">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">
+					<span style="color:red">*</span>
+						绑定人UID
+					</label>
+				</td>
+				<td>
+					<input type="text" class="form-control keyup-msc" style="width:108px"/>
+				</td>
+			</tr>
+			<tr>
+				<td width="100">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">绑定人名字</label>
+				</td>
+				<td>
+					<input type="text" class="form-control that-uname" readonly="readonly" style="width:110px"/>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input class="btn btn-primary" type="button" id="so-activate" value="激活"/>
+				</td>
+				
+			</tr>
+		</tbody>
+	</table>
+</div>
+{else if $operation == 'uploadImg'}
+<div class="panel panel-default">
+	<div class="panel-heading">绑定广告图</div>
+	<form action="{php echo $this->createWebUrl('shoppingcard', array('op' => 'uploadImg'))}" method="post">
+	 <table class="table table-hover">
+		<tbody class="navbar-inner">
+			<tr class="form-group">
+				<td width=250>
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">ID</label>
+				</td>
+				<td>
+					<input type="text" class="form-control" name="on-cid" value="{$res['cid']}" readonly="readonly" style="width:108px"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">标示</label>
+				</td>
+				<td>
+					<input type="text" class="form-control" value="{$res['token']}" readonly="readonly" style="width:368px"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">面额</label>
+				</td>
+				<td>
+					<input type="text" class="form-control" value="{$res['price']}" readonly="readonly" style="width:108px"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">广告图</label>
+				</td>
+				<td>
+					
+					{php echo tpl_form_field_multi_image('thumb',unserialize($res['thumb']))}
+					<!-- {php echo tpl_form_field_image('thumb',$res['thumb'],'', array('extras' => array('text' => 'readonly')))} -->
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input type="submit" value="确认上传" class="btn btn-primary" />
+				</td>
+			</tr>
+		 </tbody>
+	  </table>
+	  </form>
+	</div>
+</div>
+{elseif $operation == 'batch'}
+<div class="main">
+	<p class="text-danger">
+		“批量导入优惠券 EXCEL”的表格必须是使用点击最新的 --> “下载优惠券 EXCEL”导出的表格的基础上修改<br><br>
+		<a class="btn btn-info btn-sm" href="{php echo $this->createWebUrl('shoppingcard', array('op' => batch, 'price' => 100))}">
+		下载优惠券 100
+		</a>
+		<a class="btn btn-info btn-sm" href="{php echo $this->createWebUrl('shoppingcard', array('op' => batch, 'price' => 200))}">
+		下载优惠券 200
+		</a>
+		<a class="btn btn-info btn-sm" href="{php echo $this->createWebUrl('shoppingcard', array('op' => batch, 'price' => 500))}">
+		下载优惠券 500
+		</a>
+		<a class="btn btn-info btn-sm" href="{php echo $this->createWebUrl('shoppingcard', array('op' => batch, 'price' => 1000))}">
+		下载优惠券 1000
+		</a>
+		<a class="btn btn-info btn-sm" href="{php echo $this->createWebUrl('shoppingcard', array('op' => batch, 'price' => 2000))}">
+		下载优惠券 2000
+		</a>
+		<a class="btn btn-info btn-sm" href="{php echo $this->createWebUrl('shoppingcard', array('op' => batch, 'price' => 5000))}">
+		下载优惠券 5000
+		</a>
+	</p>
+<form action="./index.php?c=site&a=entry&op=batch&do=shoppingcard&m=ewei_shopping" method="post" class="form-horizontal" role="form"  enctype="multipart/form-data">
+	<div class="panel panel-info">
+		<div class="panel-heading">批量导入优惠券 EXCEL</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">优惠券 Execl导入</label>
+				<div class="col-sm-6 col-xs-6">
+					<input type="file" name="goodsoption" class="form-control" >
+				</div>
+			</div>
+		</div>
+	</div>
+<style>
+.label{cursor:pointer;}
+</style>
+<div class="panel panel-default">
+	<div class="panel-body table-responsive">
+		<input name="token" type="hidden" value="{$_W['token']}" />
+		<input type="submit" class="btn btn-primary" value="立即导入" />
+	</div>
+	</div>
+</form>
+</div>
+{/if}
+</div>
+<script>
+	require(['bootstrap'],function($){
+		var $$transferBinding = $('.transfer-batch-binding'),
+			$$checkBinding = $('input[name="batch-binding-box"]'),
+			$$checkAll = $('.check-all');
+		$$transferBinding.click(function(){
+			var $this = $(this);
+			if($this.hasClass('btn-danger')){
+				$$checkBinding.hide();
+				$$checkAll.hide();
+				$('.batch-binding-btn').hide();
+				$('.back-batch-binding').hide();
+				$this.removeClass('btn-danger').val("进入批量激活");
+			} else {
+				$$checkBinding.show();
+				$$checkAll.show();
+				$('.batch-binding-btn').show();
+				$('.back-batch-binding').show();
+				$(this).addClass('btn-danger').val("退出批量激活");
+			}
+			
+		});
+
+		$$checkAll.click(function(){
+			
+			if ($(this).is(':checked')) {
+				$('.by-check-all').prop("checked", true);	
+			} else {
+				$('.by-check-all').prop("checked", false);
+			}
+		});
+
+		$(document).on('keyup', '.on-text', function(e) {
+			if (e.keyCode != 8) {
+				var $this = $(this);
+				$this.val($this.val().replace(/[^0-9]/g,''));
+			}
+		});
+
+		var SindingsLisenLer = function(){
+			$('form').submit(function(){
+				var flag = true;
+				$('.on-text').each(function(){
+					if($(this).val() == ""){
+						alert("请输入用户UID！");
+						$(this).focus();
+						flag = false;
+						return false;
+					}
+				});
+				if(!flag){
+					return false;
+				}
+			});
+		}
+
+		$('.batch-binding-btn').on('click',function(){
+			var $this = $(this);
+				var $that = $('input[class=by-check-all]:checked'),
+					arr = [],
+					url,
+					$HTML = '';
+				if($that.length >= 1){
+					$that.each(function(){
+						$there = $(this);
+						arr.push($there.val());						
+					});
+					url = $('.binding-url').attr('data-url-name');
+					$.ajax({
+						type : "post",
+						url : url,
+						data : {arr: arr,type: 1},
+						dataType : 'json',
+						success : function(et){
+							if(et.status == -200){
+								alert(et.msc);
+								return false;
+							}
+							if(typeof(et) === 'object'){
+								var betchUrl = $('.betch-name-url').attr("data-url-name"),
+									List;
+					
+								$HTML = $("<form></form>");
+								$HTML.attr("action",betchUrl);
+								$HTML.attr("method",'post');
+								for (var i=0,Len=et.length;i<Len;i++){
+									List += '<tr><td><label class="col-xs-12 col-sm-3 col-md-2" style="width:110px">ID</label></td>\
+												  <td><input type="text" value="'+et[i].cid+'" name="betchCid[]" readonly="readonly" class="form-control"/></td>\
+											  </tr>\
+											   <tr><td><label class="col-xs-12 col-sm-3 col-md-2">标示</label></td>\
+											  	  <td>'+et[i].token+'</td>\
+											  </tr>\
+											  <tr><td><label class="col-xs-12 col-sm-3 col-md-2">面额</label></td>\
+											  	  <td>'+et[i].price+'</td>\
+											  </tr>\
+											  <tr><td><label class="col-xs-12 col-sm-3 col-md-2">用户UID</label></td>\
+											  	  <td><input type="text" name="betchUid[]" class="form-control on-text" style="width:110px"/></td>\
+											  </tr>\
+											  ';
+								
+								}
+								List += "<tr><td colspan='2'><input type='submit' value='确认批量激活' class='btn btn-primary'/></td></tr>";
+								var s = $HTML.append(List);
+								$('.pagination-centered').hide();
+								$('.table-hover').html(s);
+								SindingsLisenLer();
+						
+							}
+						}
+
+					});
+				} else {
+					alert("请选择复选框！");
+				}
+		});
+
+
+		$("#so-activate").bind({
+			click : function(){
+				var type, uid, cid;
+				type = 0;
+				uid = $('.keyup-msc').val();
+				cid = $('.that-cid').attr("placeholder");
+				$.ajax({
+					type : 'post',
+					url : location.href,
+					data : {type: type, uid: uid, cid: cid},
+					dataType : 'json',
+					success : function(data){
+						if(data.status == 200){
+							alert(data.msc);
+							window.location.href = data.link;
+						} else {
+							alert(data.msc);
+							return false;
+						}
+					}
+				});
+			}
+		});
+
+		$('.keyup-msc').blur(function(){
+			var type, uid;
+			uid = $(this).val();
+			$.ajax({
+				type : 'post',
+				url : location.href,
+				data : {type: -1 ,uid: uid},
+				dataType : 'json',
+				success : function(data){
+					if(data.status == 200){
+						$('.that-uname').val(data.nickname);
+					} else {
+						$('.that-uname').val(data.msc);
+					}
+				}
+			});
+		});
+
+		$(".so-activate-out").click(function(){
+			if(confirm("真的要取消吗？")){
+				var url = $(this).next('input').attr('data-url-name'),
+				ncid = $(this).parents('tr').find('.redpacket-cid').text();
+				var cid = $.trim(ncid);
+				$.ajax({
+					type: 'post',
+					url: url,
+					data: {type: 3,cid: cid},
+					dataType: 'json',
+					success: function(data){
+						if(data.status == 200){
+							alert(data.msc);
+							location.replace(location.href);
+						} else {
+							alert(data.msc);
+							return false;
+						}
+					}
+				});
+			} else {
+				return false;
+			}
+			
+		});
+
+		$('.so-activate').click(function(){
+			var url = $(this).next('input').attr('data-url-name');
+				location.href = url;
+		});
+
+		$('.btn').hover(function(){
+			$(this).tooltip('show');
+		},function(){
+			$(this).tooltip('hide');
+		});
+		var $load = $('.loading'),
+			$num = $('.ticket-num'),
+			$btn = $('.add-card-submit'),
+			$money = $('.add-card-money'),
+			num = 0, money = 0;
+		$money.on('click', function() {
+			$(this).addClass('on').siblings().removeClass('on');
+		});
+
+		$btn.on('click', function() {
+			num = $num.val();
+			if (num == '' || num == 0) {
+				alert('请输入卡券数量！');
+				return false;
+			}
+			$money.each(function() {
+				if ($(this).hasClass('on')) {
+					money = $(this).attr('data-money');
+				}
+			});
+			if (money != 0) {
+				$load.show();
+				$.ajax({
+					type: 'post',
+					url: location.href,
+					data: {num: num, price: money},
+					dataType: 'json',
+					success: function(data) {
+						alert(data.msg);
+						$load.hide();
+					}
+				});
+			}
+		});
+
+		var $start = $('.btn-start'),
+			cid, type, url;
+		$start.on('click',function(){
+			var $this = $(this);
+			cid = $this.parents('tr').find('.redpacket-cid').text();
+			type = ($this.hasClass('on')) ? 0 : 1;  //0 启动状态 1 禁用状态
+
+			url  = $(".get-url").attr('data-url-name');
+			$.ajax({
+				type: 'post',
+				url: url,
+				data: {cid: cid, type: type},
+				dataType:'json',
+				success: function(data) {
+					if (data.status == 200) {
+						if (data.type == 1) {
+							$this.text('关闭').addClass('on').addClass('btn-danger');
+						} else {
+							$this.text('启动').removeClass('btn-danger').removeClass('on');
+						}
+					} else {
+						alert(data.msc);
+					}
+				}
+			});
+		});
+
+	});
+</script>
+{template 'common/footer'}

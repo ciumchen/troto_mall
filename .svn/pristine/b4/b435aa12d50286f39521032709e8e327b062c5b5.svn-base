@@ -1,0 +1,41 @@
+use ichibanv2;
+
+DROP PROCEDURE IF EXISTS proc_closeOrderByTimer;
+
+DELIMITER $$
+#检查订单（超过12小时未支付则关闭订单&释放库存）
+CREATE PROCEDURE proc_closeOrderByTimer()
+BEGIN
+  DECLARE fig1,fig2 INT DEFAULT 0;
+  DECLARE orders_id INT;
+  DECLARE id,goods_id, goods_num, goods_optionid, goods_totalcnf, goods_total, goods_stock INT;
+  DECLARE sql_cur_outer CURSOR FOR select DISTINCT id from ims_shopping_order where status=0 and (unix_timestamp()-createtime)>10;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET fig1=1;
+
+  OPEN sql_cur_outer;
+  REPEAT
+    FETCH sql_cur_outer INTO orders_id;
+    IF not fig1 THEN
+      update ims_shopping_order set status='-2' where id=orders_id;
+      BEGIN
+        DECLARE sql_cur_inner CURSOR FOR SELECT DISTINCT tba.id,tba.goodsid,tba.total as num,tba.optionid,tbb.totalcnf,tbb.total,tbc.stock FROM ims_shopping_order_goods AS tba LEFT JOIN ims_shopping_goods AS tbb ON tba.goodsid=tbb.id LEFT JOIN ims_shopping_goods_option AS tbc ON tbc.goodsid=tba.goodsid WHERE tba.orderid=orders_id;
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET fig2=1;
+        OPEN sql_cur_inner;
+        REPEAT
+          FETCH sql_cur_inner into id,goods_id,goods_num,goods_optionid,goods_totalcnf,goods_total,goods_stock;
+          #只回退拍下立减商品库存
+          IF goods_totalcnf=0 THEN
+            IF goods_stock IS NOT NULL THEN
+              update ims_shopping_goods_option set stock=stock+goods_num where goodsid=goods_id AND id=goods_optionid;
+            ELSE
+              update ims_shopping_goods set total=total+goods_num where goodsid=goods_id;
+            END IF;
+          END IF;
+        UNTIL fig2 END REPEAT;
+        CLOSE sql_cur_inner;
+        SET fig2=0;
+      END;
+    END IF;
+  UNTIL fig1 END REPEAT;
+  CLOSE sql_cur_outer;
+END $$

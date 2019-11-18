@@ -1,0 +1,79 @@
+<?php $this->title = '订单详情'; ?>
+
+<div class="location-affirm">
+    <span class="icon-noting"></span>
+    <ul class="location">
+        <li>订单编号：<p><?= $order->ordersn ?></p></li>
+        <li>订单状态：<p><?= $order_status_name ?></p></li>
+    </ul>
+</div>
+
+<div class="location-affirm">
+    <span class="icon-position"></span>
+    <ul class="location">
+        <li>收货人：<p><?= $order['realname'] ?></p> <span><?= $order['mobile'] ?></span></li>
+        <li>收货地址：<?= $order['province'] . ' ' . $order['city'] . ' ' . $order['area'] . ' ' . $order['address'] ?></li>
+    </ul>
+</div>
+
+<div class="look-up" style="display:none;">
+    <a href="">
+        <span class="icon-cargocar"></span>
+        <h3>查看物流状态</h3><i class="fxspa" style="top:-4px;right: 0;"></i>
+    </a>
+</div>
+
+<?php if (!empty($orderGoods)): ?>
+    <ol class="main-content">
+        <?php foreach ($orderGoods as $product): ?>
+            <li><h2><?php echo ($product['name']) ? $product['name'] : '暂无仓库' ?></h2></li>
+            <li>
+                <ol class="content-tmain">
+                    <li><a href="/goods/detail?id=<?=$product['goodsid']?>"><img src="<?= $product['thumb'] ?>" alt=""></a></li>
+                    <li><a href="##">X<?= $product['total'] ?></a></li>
+                    <li><a href="###">￥<?= $product['marketprice'] ?></a></li>
+                    <li><a href="/goods/detail?id=<?=$product['goodsid']?>"><?= $product['title'] ?></a></li>
+                </ol>
+            </li>
+        <?php endforeach; ?>
+    </ol>
+<?php endif; ?>
+<div class="tariff">
+    <ul>
+        <li><h2>应付总额</h2><a href="#">￥<?= $order->price ?></a></li>
+        <li><h2>商品总额</h2><a href="#">￥<?= $order->goodsprice ?></a></li>
+        <?php if ($order->coupon > 0): ?>
+            <!--<li><h2>首单优惠</h2><a href="#">-￥<?php echo $order->coupon; ?></a></li>-->
+        <?php endif; ?>
+
+        <?php $discount = ($order->status > 0) ? $order->coupon : 0; ?>
+
+        <?php if ($coupon !== false): ?>
+            <li><h2>优惠券</h2><a href="#">-￥<?= $coupon['value'] ?></a></li>
+        <?php endif; ?>
+
+        <li><h2>商品应付总计</h2><a href="#">￥<?= $order_price ?></a></li>
+        <li><h2>运费</h2><a href="#">￥0.00</a></li>
+        <li><h2>税费</h2><a href="#">￥<?= number_format($taxtotal, 2) ?></a></li>
+        <li>
+            <ol>
+                <li>订单编号：<a href="##"><?= $order->ordersn ?></a><span style="display:none;">复制</span></li>
+                <li>下单时间：<a href="##"><?= date('Y-m-d', $order->createtime) ?></a></li>
+                <li style="height: initial;line-height: 20px;">订单备注：<a href="##"><?=$order->remark?></a></li>
+            </ol>
+        </li>
+        <li style='display:none'><span>删除订单</span></li>
+        <?php if ($order->status == 0): ?>
+            <li onclick="javascript:window.location.href='/order/pay?order_id=<?= $order->id ?>'"><span>支付</span></li>
+            <li onclick="javascript:window.location.href='/order/cancel?order_id=<?= $order->id ?>'"><span>取消订单</span>
+            </li>
+        <?php endif; ?>
+
+        <?php if ($order->status == 2): ?>
+            <li onclick="javascript:window.location.href='/order/delivered?order_id=<?= $order->id ?>'">
+                <span>收货</span>
+            </li>
+        <?php endif; ?>
+    </ul>
+</div>
+

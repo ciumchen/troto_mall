@@ -1,0 +1,250 @@
+{php $newUI = true;}
+{template 'common/header'}
+
+<ol class="breadcrumb" style="padding:5px 0;">
+	<li><a href="{url 'home/welcome/ext'}"><i class="fa fa-cogs"></i> &nbsp; 微商城</a></li>
+	<li>商城功能</li>
+	<li>销售专题管理</li>
+</ol>
+
+<ul class="nav nav-tabs">
+	<li {if $do == 'display' && $operation == 'display'} class="active" {/if}>
+		<a href="{php echo url('shopping/topic',array( 'm'=>'ewei_shopping'))}">销售专题管理</a>
+	</li>
+	<li {if $do == 'add'} class="active"{/if}>
+		<a href="{php echo url('shopping/topic/add', array('op'=>'handle', 'm'=>'ewei_shopping'))}">{if $topicid}修改{else}添加{/if}专题</a>
+	</li>
+	{if $do == 'detail' && $operation == 'display'}<li  class="active"><a href="##">销售专题详情</a></li>
+	{/if}
+	<li {if $do == 'address' && $operation == 'handle'} class="active" {/if}>
+		<a href="{php echo url('shopping/topic/address', array('op'=>'handle', 'sid' => $_GPC['sid']))}">
+			{$ptr_title}
+		</a>
+	</li>
+</ul>
+{if $do=='display' && $operation=='display'}
+<p class="text-danger">
+	状态：首页展示使用逆序；&nbsp;&nbsp;&nbsp;只有在展示日期内、且状态为启用的专题才会被显示
+</p>
+<div class="panel panel-default">
+	<div class="panel-body table-responsive" >
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th style="width:80px;">专题ID</th>
+					<th style="width:450px;">专题名称</th>
+					<th style="width:320px;">展示日期(开始时间--结束时间)</th>
+					<th>显示顺序</th>
+					<th>直接跳转</th>
+					<th>焦点轮播展示</th>
+					<th>状态</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list $item}
+				<tr class="list" data-sid='{$item["topicid"]}' data-state='{$item["status"]}'>
+					<td>{$item['topicid']}</td>
+					<td>{$item['title']}</td>
+					<td>{php echo date('Y-m-d H:i:s', $item['starttime'])} -- {php echo date('Y-m-d H:i:s', $item['endtime'])}</td>
+					<td>{$item['displayorder']}</td>
+					<td>{php echo $item['isjump']?'是':'否'}</td>
+					<td>
+						{if $item['isfocus'] == '1'}
+						<span class="btn btn-success btn-sm">是</span>
+						{else if $item['isfocus'] == '0'}
+						<span class="btn btn-danger btn-sm">否</span>
+						{/if}
+					</td>
+					<td>
+						{if $item['enabled'] == '1'}
+						<span class="btn btn-success btn-sm">启用</span>
+						{else if $item['enabled'] == '0'}
+						<span class="btn btn-danger btn-sm">禁用</span>
+						{/if}
+					</td>
+					<td>
+						<a class="btn btn-info btn-sm" href="{php echo url('shopping/topic',array('topicid'=>$item['topicid'],'do'=>'add','op'=>'handle', 'm'=>'ewei_shopping'))}">编辑</a>
+						<a class="btn btn-info btn-sm" href="{php echo url('shopping/topic',array('topicid'=>$item['topicid'],'do'=>'detail', 'm'=>'ewei_shopping'))}">详情</a>
+					</td>
+				{/loop}
+			</tbody>
+		</table>
+	</div>
+</div>
+{$pager}
+{else if $do=='detail' && $operation=='display'}
+<div class="panel panel-default">
+	<div class="panel-heading">{$op_type}销售专题详情</div>
+	<div class="panel-body">
+		<div class="form-group" style="float:left;width:49%">
+			<label class="col-xs-12 col-md-2 control-label">专题ID：</label>
+			<div class="col-sm-2" >
+				<span style="color:red">{$detailData['topicid']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:49%">
+			<label class="col-xs-12 col-md-2 control-label">专题链接：</label>
+			<div class="col-sm-5" >
+				<span style="color:red">http://mall.troto.com.cn/goods/topic?id={$detailData['topicid']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:49%">
+			<label class="col-xs-12 col-md-2 control-label">专题名称：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailData['title']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:49%">
+			<label class="col-xs-12 col-md-2 control-label">创建时间：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{php echo date('Y-m-d H:i:s', $detailData['createtime'])}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:49%">
+			<label class="col-xs-12 col-md-2 control-label">启用状态：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{php echo $detailData['enabled']?'启用':'禁用'}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:49%">
+			<label class="col-xs-12 col-md-2 control-label">焦点轮播：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{php echo $detailData['isfocus']?'是':'否'}</span>
+			</div>
+		</div>
+
+		<div class="form-group" style="float:left;width:49%">
+			<label class="col-xs-12 col-md-2 control-label">开始时间：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{php echo date('Y-m-d H:i:s', $detailData['starttime'])}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:49%">
+			<label class="col-xs-12 col-md-2 control-label">结束时间：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{php echo date('Y-m-d H:i:s', $detailData['endtime'])}</span>
+			</div>
+		</div>
+
+		<div class="form-group" style="float:left;width:49%">
+			<label class="col-xs-12 col-md-2 control-label">显示顺序：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{$detailData['displayorder']}</span>
+			</div>
+		</div>
+		<div class="form-group" style="float:left;width:49%">
+			<label class="col-xs-12 col-md-2 control-label">跳转链接：</label>
+			<div class="col-sm-2" style="width:180px">
+				<span style="color:red">{if $detailData['isjump']}{$detailData['link']}{else}否{/if}</span>
+			</div>
+		</div>
+	</div>
+	<div style="width:100%;border-bottom:1px dashed #ddd"></div>
+	<div class="panel-body">{php echo html_entity_decode($detailData['content']) }</div>
+</div>
+{else if $operation == 'handle'}
+<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+	<div class="panel panel-default">
+		<div class="panel-heading">{$op_type} 销售专题信息</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">专题名称：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input  class="form-control" name="title" value="{$item['title']}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">专题简介：</label>
+				<div class="col-sm-9 col-xs-12">
+    				<textarea class="form-control" id="description" name="description" rows="2">{$item['description']}</textarea>
+    			</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">启用状态</label>
+				<div class="col-sm-9 col-xs-12">
+					<label for="enabled" class="radio-inline"><input type="radio" name="enabled" value="0" id="enabled" {if empty($item) || $item['enabled'] == 0}checked="true"{/if} /> 禁用</label>
+					&nbsp;&nbsp;&nbsp;
+					<label for="enabled" class="radio-inline"><input type="radio" name="enabled" value="1" id="enabledenabled"  {if !empty($item) && $item['enabled'] == 1}checked="true"{/if} /> 启用</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">焦点轮播展示</label>
+				<div class="col-sm-9 col-xs-12">
+					<label for="isfocus" class="radio-inline"><input type="radio" name="isfocus" value="1" id="enabledenabled"  {if !empty($item) && $item['isfocus'] == 1}checked="true"{/if} /> 是</label>
+					&nbsp;&nbsp;&nbsp;
+					<label for="isfocus" class="radio-inline"><input type="radio" name="isfocus" value="0" id="isfocus" {if empty($item) || $item['isfocus'] == 0}checked="true"{/if} /> 否</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">展示顺序：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="displayorder" value="{$item['displayorder']}" style="width:65px">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">专题图片：</label>
+				<div class="col-sm-9 col-xs-12">
+					{php echo tpl_form_field_image('thumb', $item['thumb'], '', array('extras' => array('text' => 'readonly')))}
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">有效时间</label>
+				<div class="col-sm-4 col-xs-6">{php echo tpl_form_field_date('starttime', !empty($item['starttime']) ? date('Y-m-d H:i',$item['starttime']) : date('Y-m-d H:i'), 1)}</div>
+				<div class="col-sm-4 col-xs-6">{php echo tpl_form_field_date('endtime', !empty($item['endtime']) ? date('Y-m-d H:i',$item['endtime']) : date('Y-m-d H:i', strtotime('+5 days')), 1)}</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">跳转链接：</label>
+				<div class="col-sm-9 col-xs-12">
+					<input class="form-control" name="link" value="{$item['link']}">
+					<span class="help-block"><strong style="color:red">特别注意: </strong>如果填写的是频道页面URL，详情内容可为空；否则，请置空并填写详情内容</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">专题详情</label>
+				<div class="col-sm-9 col-xs-12">
+					<textarea name="content" class="form-control richtext" cols="30" rows="30">{$item['content']}</textarea>
+				</div>
+			</div>
+			<script language='javascript'>
+			require(['jquery', 'util'], function($, u){ $(function(){ u.editor($('.richtext')[0]); }); });
+			</script>
+			<div class="form-group col-sm-12">
+				<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+	</div>
+</form>
+{/if}
+<script>
+$(function(){
+	var $fetchItem = $('.fetch-item');
+	 $fetchItem.on('change',function(){
+
+	 	var Item = $(this).children();
+	 	//console.log(Item)
+	 	Item.each(function(){
+	 		if($(this).get(0).selected == true){	
+	 			var this_Id = $(this).val(),
+	 				fetchMobile = $('.fetch-mobile');
+	 			fetchMobile.each(function(){
+	 				var $this = $(this);
+	 				 if($this.attr('data-rol') == this_Id){
+			 				var fetchMobileTxt = $this.val();
+			 				$("#suppliers-mobile").show();
+			 				$this.parent('div').children(":first").val(fetchMobileTxt);
+			 		 }
+	 			})
+	 			if($(this).get(0).index === 0){
+	 					fetchMobile.parent('div').children(":first").val("");
+	 					$("#suppliers-mobile").hide();
+	 			}	
+	 		}
+	 		
+	 	})
+	 })
+})
+</script>
+
+{template 'common/footer'}

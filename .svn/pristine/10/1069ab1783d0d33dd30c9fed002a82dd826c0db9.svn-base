@@ -1,0 +1,191 @@
+{template 'common/header'}
+{template 'common'}
+{template 'operationsmenu'}
+<div class="main">
+{if $operation == 'add'}
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="form1">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				红包{if $id != ''}修改{else}添加{/if}
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">总金额：</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="countmoney" class="form-control" value="{php echo $res['countmoney'] ? $res['countmoney'] : '100.00';}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">金额设置：</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="money" class="form-control" value="{php echo $res['money'] ? $res['money'] : '0';}" />
+						<span class="help-block">设置格式：
+							<br>1、随机金额上述如：5,10,15,20 但是“,”必须为英文格式<br>2、固定金额则直接填写一个数字如 1 ；<br>3、0为随机，但是用户每次领取不超过20
+						</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">数量：</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="sendnum" class="form-control" value="{php echo $res['sendnum'] ? $res['sendnum'] : 10;}" />
+						<span class="help-block">默认0的情况,抽完停止</span>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">限时时间：</label>
+					<div class="col-sm-4 col-xs-6">{php echo tpl_form_field_date('timestart', !empty($res['timestart']) ? date('Y-m-d H:i',$res['timestart']) : date('Y-m-d H:i'), 1)}</div>
+					<div class="col-sm-4 col-xs-6">{php echo tpl_form_field_date('timeend', !empty($res['timeend']) ? date('Y-m-d H:i',$res['timeend']) : date('Y-m-d H:i'), 1)}</div>
+					<div class="help-block help-prompt">没有修改限时时间中的开始时间以及结束时间时默认永久</div>
+				</div>
+				{if $_W['user']['uid'] == 1}
+				<!-- <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">状态</label>
+					<div class="col-sm-9 col-xs-12">
+						<label class='radio-inline'>
+							<input type='radio' name='status' value='1' {if $res['status']==1}checked{/if} /> 可用
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' name='status' value='0' {if $res['status']==0}checked{/if} /> 禁用
+						</label>
+					</div>
+				</div> -->
+				{/if}
+				<hr><br>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">标题：</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="title" class="form-control" value="{$res['title']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">描述：</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="desc" class="form-control" value="{$res['desc']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">分享缩略图：</label>
+					<div class="col-sm-9 col-xs-12">
+						{php echo tpl_form_field_image('thumb', $res['thumb'], '', array('extras' => array('text' => 'readonly')))}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group col-sm-12">
+			<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+	</form>
+{elseif $operation == 'display'}	
+<p class="text-danger">
+	<a class="btn btn-success" href="{php echo $this->createWebUrl('redpacket',array('op'=>'add'))}">红包新增</a>
+</p>
+<div class="panel-body table-responsive">
+	<table class="table table-hover">
+		<thead class="navbar-inner">
+			<tr>
+				<th style="width:30px;">ID</th>
+				<th style="width:50px;">链接</th>
+				{if $_W['user']['power'] & ADMINISTRATOR}
+					<th style="width:80px;">操作人员</th>
+				{/if}
+				<th style="width:80px;">随机金额</th>
+				<th style="width:120px;">总金额</th>
+				<th style="width:60px;">可抢数量</th>
+				<th style="width:60px;">已抢金额</th>
+				<th style="width:60px;">已抢数量</th>
+				<th style="width:170px;">活动时间</th>
+				<th style="width:110px;">创建时间</th>
+				<th style="width:100px; text-align:center">状态</th>
+				<th style="width:100px;">操作</th>
+			</tr>
+		</thead>
+		<tbody class="redpacket-list">
+			{loop $res['list'] $item}
+			<tr>
+				<td>{$item['fid']}
+				</td>
+				<td>
+					{if $item['deleted'] == 0 || $_W['user']['power'] & ADMINISTRATOR}
+					<a href="{$_W['siteroot']}app/index.php?c=entry&a=dispay&do=redpack&id={$item['id']}&i={$_W['uniacid']}&id={$item['fid']}&m=ewei_shopping&wxref=mp.weixin.qq.com#wechat_redirect" target="_blank">链接
+					</a>
+					{/if}
+				</td>
+				{if $_W['user']['power'] & ADMINISTRATOR}
+					<td><a href="{php echo url('user/edit',array('uid'=>$item['operatorid']));}">{$item['username']}</a></td>
+				{/if}
+				<td>
+					{if $item['money'] == 0}
+						随机金额
+					{else}
+						{$item['money']}
+					{/if}
+				</td>
+				<td>{$item['countmoney']}(剩余{php echo $item['countmoney']-$item['gain']}元)</td>
+				<td>{php echo ($item['sendnum'] == 0) ? '无限' : $item['sendnum'];}</td>
+				<td>{$item['gain']}</td>
+				<td>{$item['getnum']}</td>
+				<td>{if $item["timestart"] != $item["timeend"]}{php echo '开始时间:'.date("Y-m-d H:i",$item["timestart"]).'<br>结束时间:'.date("Y-m-d H:i",$item["timeend"]);}{else}永久{/if}</td>
+				<td>{php echo date("Y-m-d H:i",$item["createtime"]);}</td>
+				<td class="redpacket-status {if $item['status'] == 1}on{/if}" align="center" data-id="{$item['fid']}">
+					{if $item['status'] == 1}正常{else if $item['status'] == 0}禁用(申请使用中){else}{$item['status']}{/if}</td>
+				<td style="text-align:left;">
+					<a href="{php echo $this->createWebUrl('redpacket', array('op' => 'add', 'id' => $item['fid']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="修改"><i class="fa fa-pencil"></i></a>
+					{if $item['deleted'] == 0}
+					<a href="{php echo $this->createWebUrl('redpacket', array('op' => 'delete', 'id' => $item['fid']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="删除"><i class="fa fa-times"></i></a>
+					{else if $_W['user']['power'] & ADMINISTRATOR}
+					已删除
+					{/if}
+				</td>
+			</tr>
+			{/loop}
+		</tbody>
+	</table>
+	{$res['pager']}
+</div>
+<script type="text/javascript">
+	$(function() {
+		var $status = $('.redpacket-status');
+		// 状态设置
+		$status.on('click', function() {
+			var $this = $(this),
+				_id = $this.attr('data-id'),
+				status = '';
+			if ($this.hasClass('on')) {
+				status = 0;
+			} else {
+				status = 1;
+			}
+			// 发送Ajax数据
+			$.ajax({
+				type: 'post',
+				url: "{php echo $this->createWebUrl('redpacket',array('op'=>'setStatus'))}",
+				data: {status: status, id:_id},		// 改变的状态 1 或 0
+				dataType: 'json',
+				success: function(data) {
+					if (data.status == 200) {
+						// 设置状态
+						if (status == 1) {
+							$this.text('正常').addClass('on');
+						} else {
+							$this.text('禁用(申请使用中)').removeClass('on');
+						}
+					}
+				}
+			});
+		});
+	});
+</script>
+{/if}
+</div>
+<script>
+	require(['bootstrap'],function($){
+		$('.btn').hover(function(){
+			$(this).tooltip('show');
+		},function(){
+			$(this).tooltip('hide');
+		});
+
+	});
+</script>
+{template 'common/footer'}

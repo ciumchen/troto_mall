@@ -1,0 +1,137 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li {if $do == 'display'}class="active"{/if}>
+		<a href="{php echo url('community/application/display')}">物业申请</a>
+	</li>
+</ul>
+{if $do=='display'}
+<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal" role="form">
+		<input type="hidden" name="c" value="community">
+		<input type="hidden" name="a" value="application">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">UID</label>
+				<div class="col-sm-6 col-md-8 col-lg-8 col-xs-12">
+					<input type="text" class="form-control" name="uid" class="" value="{$_GPC['uid']}" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">用户名</label>
+				<div class="col-sm-6 col-md-8 col-lg-8 col-xs-12">
+					<input type="text" class="form-control" name="username" class="" value="{$_GPC['username']}" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">物业类型</label>
+				<div class="col-sm-6 col-md-8 col-lg-8 col-xs-12">
+					<select class="form-control" style="margin-right:15px;" name="type" >
+						<option value="0"{if 0 == $_GPC['type']} selected="selected"{/if}>请选择物业类型</option>
+						<option value="1"{if 1 == $_GPC['type']} selected="selected"{/if}>物业 小区</option>
+						<option value="2"{if 2 == $_GPC['type']} selected="selected"{/if}>物业 写字楼</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">社区名</label>
+				<div class="col-sm-6 col-md-8 col-lg-8 col-xs-12">
+					<input type="text" class="form-control" name="communityname" class="" value="{$_GPC['communityname']}" />
+				</div>
+				<div class="pull-right col-xs-12 col-sm-3 col-md-2 col-lg-2">
+					<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<form method="post" class="form-horizontal" id="form1">
+<div class="panel panel-default ">
+	<div class="panel-heading">
+		物业申请（当前搜索到 <label class="text text-danger">{$res['total']}</label> 条数据）
+	</div>
+	<div class="table-responsive panel-body">
+	<table class="table table-hover">
+		<input type="hidden" name="do" value="del" />
+		<thead class="navbar-inner">
+			<tr>
+				<th width=60>编号</th>
+				<th width=70>用户ID</th>
+				<th width=120>用户名</th>
+				<th width=150>社区名</th>
+				<th width=300>物业地址</th>
+				<th width=150>手机</th>
+				<th>申请类型</th>
+				<th width=250>申请状态(点击按钮可更改状态)</th>
+				<th>注册时间</th>
+			</tr>
+		</thead>
+		<tbody>
+		{loop $res['list'] $li}
+			<tr>
+				<td>{$li['caid']}</td>
+				<td>
+					<a href="{php echo url('mc/member/post', array('uid'=>$li['uid']));}">
+						<span>{$li['uid']}</span>
+					</a>
+				</td>
+				<td>
+					<a href="{php echo url('mc/member', array('username'=>$li['username']));}">
+						{$li['username']}
+					</a>
+				</td>
+				<td>{if $li['communityname']}{$li['communityname']}{else}未完善{/if}</td>
+				<td title="{$li['province']}{$li['city']}{$li['area']}{$li['address']}">{$li['province']}{$li['city']}{$li['area']}{$li['address']}</td>
+				<td>{if $li['mobile']}{$li['mobile']}{else}未完善{/if}</td>	
+				<td data-type="{$li['type']}">{php echo $li['type'] == 1? '物业 小区':'写字楼'; }</td>
+				<td>
+				{if $li['status'] == 2}
+						<span class="btn btn-info btn-sm">完成</span>
+					{else if $li['status'] == 1}
+						<span data-status="{$li['status']}" class="btn btn-success btn-sm appliStatus">通过</span>
+					{else}
+						<span data-status="{$li['status']}" class="btn btn-default btn-sm appliStatus">申请中</span>
+					{/if}
+				</td>
+				<td>{php echo date('Y-m-d H:i',$li['createdt'])}</td>
+			</tr>
+		{/loop}
+		</tbody>
+
+	</table>
+</div>
+</div>
+	{$res['pager']}
+</form>
+<script>
+	require(['jquery', 'util'], function($, u){
+		$('.appliStatus').click(function(){
+			var $this = $(this);
+			var _status = $this.data('status');
+			var _id = parseInt($this.closest('tr').find('td:first-child').html());
+			if(_id > 0 && confirm('是否确定修改？')){
+				$.post("{php echo url('community/application/poststatus');}", {id:_id, status:_status}, function(msg){
+					console.log(msg)
+					if(msg.status == 1){
+						$this.removeClass('btn-default').addClass('btn-success').data('status', msg.status).text('通过');
+					}else if(msg.status == 2){
+						$this.removeClass('btn-success').addClass('btn-info').data('status', msg.status).text('完成');
+					}
+					u.message(msg.msg, '', 'error');
+				}, 'json');
+
+				return true;
+			}else{
+				u.message('无法删除；当前获取的参数是：'+_id, '', 'error');
+			}
+			return false;
+		});
+		$('.btn').hover(function(){
+			$(this).tooltip('show');
+		},function(){
+			$(this).tooltip('hide');
+		});
+	});
+</script>
+{/if}
+{template 'common/footer'}

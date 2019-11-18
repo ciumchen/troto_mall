@@ -1,0 +1,62 @@
+<?php $this->title = '主卡发钱 操作 - '.Yii::$app->params['site_name'];?>
+<style type="text/css">
+.blk { background: #fff; border-radius: 10px; margin: 5px 10px; height: 100%; padding: 10px; width: 95%; }
+.list-group-item-text{ line-height: 1.5; }
+.txtbold{ color: #3e5569; font-weight:bold; }
+.btnhandout { margin-top: .5em; border-radius: 15px; background-color: #5895c7; border-color: #73b0e5; line-height: 1.18; width: 60%; }
+.item-icon { width:22px; height:22px; }
+.handout-dt, .handout-mark {display: inline-block; font-weight: bold; }
+.handout-dt{ width: 35%;}
+</style>
+<div class="row" style="background-color:#E7F3ED; color:#3e5569;">
+    <div class="col-xs-12 bgf2">
+        <div class="mtb5 clearfix"><span class="font16"><span><img class="item-icon" src="/images/icon_orders.png"></span> 车主信息</span></div>
+        <ul class='list-group' style="border-radius:15px">
+          <li class="list-group-item txtbold">姓名：<?=$driverUserList['realname']?></li>
+          <li class="list-group-item txtbold">手机：<?=$toDriverUser['phone']?></li>
+          <li class="list-group-item txtbold">车牌：<?=$toDriverUser['carsn']?></li>
+          <li class="list-group-item txtbold">车队：<?=$toDriverUser['name']?></li>
+        </ul>
+    </div>
+    <div class="col-xs-12 bgf2">
+        <div class="mtb5 clearfix"><span class="font16"><span><img class="item-icon" src="/images/icon_handout.png"></span> 最近发放记录（3个月内）</span></div>
+        <ul class='list-group' style="border-radius:5px;height:206px;overflow-y:scroll; overflow-x:scroll;">
+          <?php foreach ($driverUserLog as $driverItem): ?>
+            <li class="list-group-item txtbold"><span class="handout-dt"><?=date('Y-m-d', $driverItem['createtime'])?></span><span class="handout-mark">主卡使用余额发钱￥<?=$driverItem['amount']?>元</span></li>
+          <?php endforeach; ?>
+            
+        </ul>
+    </div>
+
+    <div class="col-xs-12 bgf2" style="margin-bottom:45px;">
+        <div class="mtb5 clearfix"><span class="font16"><span><img class="item-icon" src="/images/icon_service.png"></span> 发放统计</span></div>
+        <ul class='list-group' style="border-radius:15px">
+          <li class="list-group-item txtbold"><span class="handout-dt">历史发放：</span><span class="handout-mark">￥<?=empty($sumAmount['amount']) ? 0 : $sumAmount['amount']?></span></li>
+          <li class="list-group-item txtbold"><span class="handout-dt">本次可发：</span><span class="handout-mark">￥<?=$vipUserInfo['deposit']?></span></li>
+          <li class="list-group-item txtbold"><span class="handout-dt">立即发放：</span><span class="handout-mark">¥ <input type="text" name="deposit" id="deposit" class="deposit form-control" placeholder="0.00" style="width: 92%; float: right; height: 22px;" value=""></span></li>
+          <li class="list-group-item txtbold"><center><button type="submit" id="submitHandout" name="submit" class="btn btn-primary btnhandout">给该账户 发钱</button></center></li>
+        </ul>
+    </div>
+
+    <?php include dirname(__DIR__).'/layouts/TrotoBottomNavBar.php'; ?>
+</div>
+<script type="text/javascript">
+$(function(){
+  var _csrf = $('meta[name="csrf-token"]').attr("content");
+  $("#submitHandout").click(function(){
+    var deposit = document.getElementById("deposit").value;
+    $.post("/member/handl?uid=<?=$driverUserList['uid']?>&driverid=<?=$toDriverUser['driverid']?>", {deposit:deposit, _csrf:_csrf}, function(result){
+      if (result.code==2000) {
+        if (confirm("分配成功，回到列表?") ) {
+          window.location.href="/member/handout";
+        }
+        
+      }else{
+        alert("分配金额失败，请稍后重试!");
+      }
+    });
+  });
+});
+
+</script>
+<?php // include '../views/layouts/TrotoWxshare.php';?>

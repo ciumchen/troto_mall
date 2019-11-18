@@ -1,0 +1,182 @@
+<link href="css/style.css" rel="stylesheet">
+	<!--main 内容开始-->
+    <div id="overflow_canvas_container">	
+    	<!-- 替换位置 -->
+		<div id="canvas">
+			<div id="layer_C21" type="media" class="cstlayer">
+				<div class="wp-media_content">
+					<div class="img_over" >
+						<img  class="img_lazy_load paragraph_image"  type="zoom" src="img/500079999_ej3x.jpg" >
+					</div>
+				</div>
+			</div>
+			<div id="layer_74A" type="title" class="cstlayer" >
+				<div class="wp-title_content">
+					<div style="text-align: center;">
+						<strong style="color: rgb(255, 255, 255); font-family: 微软雅黑; font-size: 36px; line-height: 50.4px;">品牌故事</strong>
+					</div>
+				</div>
+			</div>
+		  	<div id="layer_472" type="media" class="cstlayer">
+				<div class="wp-media_content">
+					<div class="img_over">
+						<img class="img_lazy_load paragraph_image" type="zoom" src="img/nxsn.png" >
+					</div>
+				</div>
+			</div>
+			<div id="layer_CBB" type="title" class="cstlayer">
+				<div class="wp-title_content" >
+					<div style="text-align: center;">
+						<span style="font-size: 14px; line-height: 19.6px; color: rgb(59, 59, 59); font-family: 微软雅黑;">公司简介</span>
+					</div>
+				</div>
+			</div>
+			<div id="layer_B12" type="media" class="cstlayer">
+				<div class="wp-media_content">
+					<div class="img_over">
+						<img class="img_lazy_load paragraph_image" type="zoom" src="img/3rhb.png" >
+					</div>
+				</div>
+			</div>
+			<div id="layer_994" type="media" class="cstlayer">
+				<div class="wp-media_content">
+					<div class="img_over">
+						<img src="img/100338531.jpg" type="zoom" class="paragraph_image">
+					</div>
+				</div>
+			</div>
+			<div id="layer_9AC" type="title" class="cstlayer">
+				<div class="wp-title_content">
+					<div>
+						<span >彩妆有限公司成立于1998年，集美丽与智慧于一身的企业掌门人XXX高瞻远瞩，运筹帷幄，创业至今，始终坚持以市场需求为导向来谋求企业 发展，以选培优秀人才为根本来做强做大事业，以诚信经营为准则来拓展维护市场网络，以关爱、敬业、创新、卓越为企业精神来增强团队的凝聚力和创造力，并严 格按照现代企业管理模式进行规范化管理。</span>
+					</div>
+				<div>
+					<span>十年征战，XX飞速成长，日化行业，盛名远扬，旗下拥有露华浓REVLON、 高丝KOSE、兰皙欧RECIPEO、艾文莉AVENIR、润肌精Junkisei、安尚秀ASIXO、奥洛菲OLEVA、凯伊秀Bio- essence、巧迪尚惠QAODSUHU</span>
+				</div>
+					<div><br>
+					</div>
+				</div>
+			</div>
+			<div id="layer_1D1" type="line" class="cstlayer">
+				<div class="wp-line_content">
+					<div class="wpline-wrapper horizontal-xgray_line04"></div>
+				</div>
+			</div>
+			<div id="layer_A64" type="media" class="cstlayer">
+				<div class="wp-media_content">
+					<div class="img_over">
+						<img  class="img_lazy_load paragraph_image" type="zoom" src="img/8bto.png">
+					</div>
+				</div>
+			</div>
+			<div id="layer_BD8" type="title" class="cstlayer">
+				<div class="wp-title_content">
+					<div style="text-align: center;">
+					<span >发展历程</span>
+					</div>
+				</div>
+			</div>
+
+			<div id="layer_2F6" type="timeline" class="cstlayer">
+				<div class="wp-timeline_content">
+					<link href="css/iconfont.css" rel="stylesheet" type="text/css">
+					<ul class="ou2 timeline-box">
+						<li class="trantim1">
+							<i class="iconfont icon-shijian"></i>
+							<div class="back1 line" style=""></div>
+						</li>
+			    	    <li class="trantim1">
+							<a class="ye2 year" style="margin-top: -30px;">2015</a>
+			      		</li>
+					    <li class="trantim2 fonhei" style="height: 164px;">
+							<div class="a1 circle">
+								<span class="month date " data-info="1-10" data-set="yearmonth" style="margin-left: -30px;">1月</span>
+							</div>
+							<div class="back1 line" style="height: 152px;"></div>
+			        		<div class="details a3 " style="margin-top: -170px;">
+								<span class="imx"></span>
+			            		<p class="title">彩妆有限公司成立于1998年，集美丽与智慧于一身的企业掌门人XXX高瞻远</p>
+			                	<div class="conts"><span>彩妆有限公司成立于1998年，集美丽与智慧于一身的企业掌门人XXX高瞻远瞩，运筹帷幄，创业至今，始终坚持以市场需求为导向来谋求企业 发展，以选培优秀人才为根本来做强做大事业，以诚信经营为准则来拓展维护市场网络，以关爱、敬业、创新、卓越为企业精神来增强团队的凝聚力和创造力，并严 格按照现代企业管理模式进行规范化管理。</span></div>
+			            	</div>
+			      		</li>
+					    <li class="trantim2 fonhei" style="height: 107px;">
+							<div class="a1 circle">
+								<span class="month date " data-info="2-10" data-set="yearmonth" style="margin-left: -30px;">2月</span>
+							</div>
+							<div class="back1 line" style="height: 95px;"></div>
+			        		<div class="details a3 " style="margin-top: -113px;">
+								<span class="imx"></span>
+			            		<p class="title">以诚信经营为准则来拓展维护市场网络</p>
+			                	<div class="conts"><span><span>以诚信经营为准则来拓展维护市场网络（雅呵雅）、NEF、薇欧薇VOV，及服装品牌Levi’s、Calvin Klein Jeans等十四大精英品牌，年销售额超过1.2亿元，公司拥有员工400多人</span></span></div>
+			            	</div>
+			      		</li>
+					    <li class="trantim2 fonhei" style="height: 107px;">
+							<div class="a1 circle">
+								<span class="month date " data-info="3-10" data-set="yearmonth" style="margin-left: -30px;">3月</span>
+							</div>
+							<div class="back1 line" style="height: 95px;"></div>
+			        		<div class="details a3 " style="margin-top: -113px;">
+								<span class="imx"></span>
+			            		<p class="title">形成于思，纵观历史，XX迈出的每一步，无不见证了团队的思想和力量</p>
+			                	<div class="conts"><span>十年风雨，天道酬勤，XX辉煌，形成于思，纵观历史，XX迈出的每一步，无不见证了团队的思想和力量，折射的也尽是XX人的智慧和不凡，我们欢呼，在XX，我们挥洒青春，无怨无悔，我们自豪，在XX，我们纪录历史，见证未来。</span></div>
+			            	</div>
+			      		</li>
+					        
+						<li class="trantim1">
+							<a class="ye2 year" style="margin-top: -30px;">2016</a>
+			      		</li>
+					    <li class="trantim2 fonhei" style="height: 107px;">
+							<div class="a1 circle">
+								<span class="month date " data-info="1-10" data-set="yearmonth" style="margin-left: -30px;">1月</span>
+							</div>
+							<div class="back1 line" style="height: 95px;"></div>
+			        		<div class="details a3 " style="margin-top: -113px;">
+								<span class="imx"></span>
+			            		<p class="title">我们自豪，在XX，我们纪录历史，见证未来</p>
+			                	<div class="conts"><span>“不为失败找理由，只为成功找方法”的经营理念指导企业拾级而上，一路辉 煌。回望，XX正以倍速拉大与追赶者的距离；前方，XX正以坚实稳健的步伐，超过一个又一个曾经领先的身影。</span></div>
+			            	</div>
+			      		</li>
+					    <li class="trantim2 fonhei" style="height: 91px;">
+							<div class="a1 circle">
+								<span class="month date " data-info="2-10" data-set="yearmonth" style="margin-left: -30px;">2月</span>
+							</div>
+							<div class="back1 line" style="height: 79px;"></div>
+			        		<div class="details a3 " style="margin-top: -97px;">
+								<span class="imx"></span>
+			            		<p class="title">以关爱、敬业、创新、卓越为企业精神来增强团队的凝聚力和创造力</p>
+			                	<div class="conts"><span>以诚信经营为准则来拓展维护市场网络，以关爱、敬业、创新、卓越为企业精神来增强团队的凝聚力和创造力，并严 格按照现代企业管理模式进行规范化管理。</span></div>
+			            	</div>
+			      		</li> 
+			      		<li class="trantim1">
+							<a class="ye2 year" style="margin-top: -30px;">2016</a>
+			      		</li>
+					    <li class="trantim2 fonhei" style="height: 107px;">
+							<div class="a1 circle">
+								<span class="month date " data-info="1-10" data-set="yearmonth" style="margin-left: -30px;">1月</span>
+							</div>
+							<div class="back1 line" style="height: 95px;"></div>
+			        		<div class="details a3 " style="margin-top: -113px;">
+								<span class="imx"></span>
+			            		<p class="title">我们自豪，在XX，我们纪录历史，见证未来</p>
+			                	<div class="conts"><span>“不为失败找理由，只为成功找方法”的经营理念指导企业拾级而上，一路辉 煌。回望，XX正以倍速拉大与追赶者的距离；前方，XX正以坚实稳健的步伐，超过一个又一个曾经领先的身影。</span></div>
+			            	</div>
+			      		</li>
+					    <li class="trantim2 fonhei" style="height: 91px;">
+							<div class="a1 circle">
+								<span class="month date " data-info="2-10" data-set="yearmonth" style="margin-left: -30px;">2月</span>
+							</div>
+							<div class="back1 line" style="height: 79px;"></div>
+			        		<div class="details a3 " style="margin-top: -97px;">
+								<span class="imx"></span>
+			            		<p class="title">以关爱、敬业、创新、卓越为企业精神来增强团队的凝聚力和创造力</p>
+			                	<div class="conts"><span>以诚信经营为准则来拓展维护市场网络，以关爱、敬业、创新、卓越为企业精神来增强团队的凝聚力和创造力，并严 格按照现代企业管理模式进行规范化管理。</span></div>
+			            	</div>
+			      		</li> 
+			        	<li class="trantim1"><div class="iconfont icon-shijian"></div></li>
+					</ul>
+				</div>
+			</div>	
+		</div>
+		<!-- 替换结束 -->
+    </div>
+	<!--main 内容结束-->

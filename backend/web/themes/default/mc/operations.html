@@ -1,0 +1,58 @@
+{template 'common/header'}
+<ul class="nav nav-tabs">
+	<li {if $do == 'display'}class="active"{/if}><a href="{php echo url('mc/operations')}">运营管理</a></li>
+	<li {if $do == 'insertUser'}class="active"{/if}><a href="{php echo url('mc/operations/insertUser');}">添加会员</a></li>
+</ul>
+
+{if $do=='insertUser'}
+<div class="main">
+<form action="" class="form-horizontal form" method="post" enctype="multipart/form-data">
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			会员运营把控
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">确认添加</label>
+				<div class="col-sm-6 col-xs-12">
+					<!-- {php echo tpl_fans_form('avatar', $profile['avatar']);} -->
+					<button type="submit" class="btn btn-primary col-lg-1" name="submit" value="提交">提交</button>
+				</div>
+				<input type="hidden" name="pid" value="{$pid}" />
+				<input type="hidden" name="page" value="{$page}" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+	</div>
+</form>
+</div>
+<script type="text/javascript">
+// require(['jquery', 'util'], function($, u){
+// 	$('#updatepwd').click(function(){
+// 		var newpwd = $("input[name='newpwd']").val();
+// 		var rnewpwd = $("input[name='rnewpwd']").val();
+// 		if (newpwd.length < 6) {
+// 			u.message('密码不得少于6个字符');
+// 			return false;
+// 		}
+// 		if (newpwd != rnewpwd) {
+// 			u.message('两次输入的密码不一致');
+// 			return false;
+// 		}
+// 		var uid = window.location.href.substr(window.location.href.lastIndexOf('=') + 1);
+// 		$.post(location.href, {uid:uid, password:newpwd}, function(resp){
+// 			if(resp == 'success') {
+// 				$('#updatepwd').next().removeClass().addClass('label label-success').text('密码修改成功');
+// 			} else if (resp == 'error') {
+// 				$('#updatepwd').next().removeClass().addClass('label label-danger').text('会员不存在或已删除');
+// 			} else {
+// 				$('#updatepwd').next().removeClass().addClass('label label-danger').text('网络错误，请稍后重试');
+// 			}
+// 		});
+
+// 	});
+// });
+</script>
+{/if}
+{template 'common/footer'}

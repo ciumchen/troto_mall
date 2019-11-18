@@ -1,0 +1,99 @@
+{template 'common/header'}
+{template 'common'}
+
+<link href="./resource/components/select2/select2.min.css" rel="stylesheet" />
+<script src="./resource/components/select2/select2.min.js"></script>
+<script src="./resource/components/select2/jquery-3.2.1.min.js"></script>
+
+<ul class="nav nav-tabs">
+	<li {if $operation == 'display'} class="active" {/if}><a href="{php echo $this->createWebUrl('servicefee',array('op' =>'display'))}">地区列表</a></li>
+	{if $operation== 'post'} <li class="active"><a href="##">编辑地区</a></li> {/if}
+</ul>
+
+{if $operation == 'display'}
+<div class="main panel panel-default">
+	<div class="panel-heading">
+		省市（共 <label class="text text-danger">{$total}</label> 条数据）
+	</div>
+	<div class="panel-body table-responsive">
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+			<tr>
+				<th style="width:80px;">省份 市</th>
+				<th style="width:80px;">开放情况</th>
+				<th style="width:80px;">操 作</th>
+			</tr>
+			</thead>
+			<tbody>
+			{loop $list $item}
+			<tr>
+				<td>{$provinceList[$item['parentid']]['name']} - {$item['name']}</td>
+				<td>包含 <strong>{$item['total']}</strong> 个区县，已经开放配送安装服务包含 <strong>{$item['open']}</strong> 个</td>
+				<td style="text-align:left;">
+					<a href="{php echo $this->createWebUrl('servicefee', array('op' => 'post', 'id' => $item['regionid']))}" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="bottom" title="修改"><i class="fa fa-pencil"></i></a>
+				</td>
+			</tr>
+			{/loop}
+			</tbody>
+		</table>
+		{$pager}
+	</div>
+</div>
+<script>
+require(['bootstrap'],function($){
+	$('.btn').hover(function(){
+		$(this).tooltip('show');
+	},function(){
+		$(this).tooltip('hide');
+	});
+});
+</script>
+{elseif $operation == 'post'}
+<div class="main">
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" onsubmit='return formcheck()'>
+		<input type="hidden" name="cabinetid" value="{$cabinet['cabinetid']}" />
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				服务地区设置
+			</div>
+			<div style="margin: 8px 0 0 16px;">
+				<span class="help-block">提示: 未添加的区域,服务费默认为上级区域的服务费金额。</span>
+			</div>
+			<div class="panel-body">
+				<table class="table table-hover ">
+					<thead>
+					<tr>
+						<th width="40">省份 城市 区(县)</th>
+						<th width="30">状态</th>
+						<th width="40">服务费</th>
+					</tr>
+					</thead>
+					<tbody id="param-items">
+						{loop $distList $p}
+						<tr>
+							<td>
+								<input name="regionid[]" type="hidden" class="form-control param_title" value="{$p['regionid']}"/>
+								<input name="name[]" type="text" class="form-control param_title" value="{$provinceList[$cityInfo['parentid']]['name']} - {$cityInfo['name']} - {$p['name']}" readonly="readonly" />
+							</td>
+							<td>
+								<select name="status[]" class='form-control pathway-status'>
+									<option value="1"{if $p['status']==1} selected="selected"{/if}>开放服务</option>
+									<option value="0"{if $p['status']==0} selected="selected"{/if}>未开放服务</option>
+								</select>
+							</td>
+							<td><input name="fee[]" type="text" class="form-control param_value" value="{$p['fee']}"/></td>
+						</tr>
+						{/loop}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="form-group">
+			<div class="col-xs-4"><input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-4" /></div>
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+	</form>
+</div>
+
+{/if}
+{template 'common/footer'}

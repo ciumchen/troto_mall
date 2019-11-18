@@ -1,0 +1,371 @@
+@charset "utf-8";
+
+/* 未关注公众号 */
+.ticket-no-attention {
+	position:absolute;
+	top:0;
+	left:0;
+	height:100%;
+	width:100%;
+	background:url(./img/scactivation/ticket-activ-bg.jpg) no-repeat;
+	background-size:cover;
+}
+.ticket-logo {
+	width:100px;
+	margin:0 auto 25px;
+	padding-top:30px;
+}
+.ticket-logo a {
+	display:block;
+	width:100%;
+	height:36px;
+	background:url(./img/scactivation/ticket-logo.png) no-repeat;
+	background-size:100% auto;
+}
+.ticket-no-activ, .ticket-no-foot {
+	width:280px;
+	height:80px;
+	margin:0 auto 25px;
+	background:url(./img/scactivation/ticket-activ-01.png) no-repeat;
+	background-size:100% auto;
+}
+.ticket-no-code {
+	display:block;
+	width:200px;
+	margin:0 auto 15px;
+}
+.ticket-no-foot {
+	width:240px;
+	height:20px;
+	margin-bottom:0;
+	background-image:url(./img/scactivation/ticket-activ-foot.png);
+}
+
+@media only screen and (max-height:480px) {
+	.ticket-logo {
+		padding-top:20px;
+		margin-bottom:20px;
+	}
+	.ticket-no-activ {
+		width:260px;
+		height:75px;
+		margin-bottom:20px;
+	}
+	.ticket-no-code {
+		width:160px;
+	}
+}
+
+/* 已关注-激活 */
+.ticket-active {
+	width:95%;
+	margin:10px auto;
+}
+.ticket-active-img {
+	display:block;
+	width:100%;
+	margin-bottom:15px;
+}
+.ticket-active h2 {
+	font-size:18px;
+	font-weight:bold;
+	margin:0 0 10px;
+}
+.ticket-get-name {
+	font-size:15px;
+}
+.get-name {
+	display:none;
+}
+.ticket-active-info {
+	display:none;
+	width:160px;
+	height:45px;
+	line-height:45px;
+	background:#fff;
+	font-size:16px;
+	margin:40px auto;
+	color:#ec652a;
+	text-align:center;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+}
+.ticket-active-info.on {
+	display:block;
+}
+.ticket-active-info i {
+	font-size:18px;
+	margin-right:12px;
+}
+.ticket-active-info i::before {
+	content:'\e645';
+}
+.ticket-active-info.err i::before {
+	content:'\e646';
+}
+.ticket-load {
+	position:absolute;
+	left:0;
+	top:0;
+	width:100%;
+	height:100%;
+	background:rgba(0,0,0,.8);
+}
+.ticket-load div {
+	position:absolute;
+	top:45%;
+	left:50%;
+	text-align:center;
+	color:#fff;
+	-webkit-transform:translate(-50%, -50%);
+	transform:translate(-50%, -50%);
+}
+.ticket-load img {
+	display:block;
+	width:110px;
+	margin:0 auto -20px;
+}
+
+
+/* *************** 领取卡券 **************** */
+.ticket-get-btn:link, .ticket-get-btn:visited {
+	display:block;
+	width:80%;
+	color:#fff;
+	letter-spacing:2px;
+	font-size:16px;
+	text-align:center;
+	line-height:40px;
+	margin:40px auto 20px;
+	background:#ec652a;
+}
+.ticket-get-btn:hover, .ticket-get-btn:active {
+	background-color:#df5c23;
+}
+
+/*加载中*/
+.load-con {
+	display: none; 
+	position: fixed;
+	top: 35%;
+	left: 50%;
+	width: 160px;
+	padding: 10px 15px 10px;
+	background:#fff;
+	font-size: 15px;
+	text-align: center;
+	margin-left:-80px;
+	z-index:999999;
+	box-shadow: 0 1px 2px rgba(0,0,0,.2);
+	-webkit-border-radius:10px;
+	border-radius:4px;
+}
+.load-con img {
+	display: block;
+	width: 85px;
+	height: 85px;
+	margin: -8px auto;
+}
+.wraper {
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	overflow:hidden;
+}
+.wraper, .container, .main, .page, .page-con {
+	width:100%;
+	height:100%;
+	padding:0;
+}
+.page {
+	position:relative;
+	overflow: hidden;
+}
+.page .page-con {
+	position: relative;
+	max-width: 640px;
+	margin: 0 auto;
+}
+.page {
+	background-repeat:no-repeat;
+	background-size:100% 100%;
+}
+
+.ticket-code {
+	width:165px;
+	margin:40px auto 20px;
+}
+.ticket-active-code {
+	margin:80px auto 20px;
+}
+.ticket-code img {
+	display:block;
+	width:160px;
+	margin:0 auto 10px;
+	box-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.ticket-code p {
+	color:#ec652a;
+	text-align:center;
+	font-size:15px;
+	font-weight:bold;
+}
+
+
+/*向上箭头*/
+.arrow {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  width: 30px;
+  height: 20px;
+  margin-left: -12px;
+  background: url(./img/screceive/arrow.png) no-repeat;
+  background-size: 100% auto;
+  z-index: 99;
+  -webkit-animation: arrowTop 1.2s infinite ease-in-out;
+  animation: arrowTop 1.2s infinite ease-in-out;
+}
+
+@-webkit-keyframes arrowTop {
+  0% {
+    opacity: .8;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translateY(-15px);
+    transform: translateY(-15px);
+  }
+}
+@keyframes arrowTop {
+  0% {
+    opacity: .8;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    -webkit-transform: translateY(-15px);
+    transform: translateY(-15px);
+  }
+}
+
+/* **** 领取完毕 **** */
+.ticket-active-ok-info {
+	overflow:hidden;
+	margin-bottom:40px;
+}
+.ticket-active-ok-info li {
+	margin-bottom:5px;
+}
+.ticket-prompt-info {
+	position:absolute;
+	left:2.5%;
+	bottom:10px;
+	width:95%;
+	padding-bottom:30px;
+	background:#efefef;
+	border-top:1px solid #d8d8d8;
+}
+.ticket-prompt-info h3 {
+	color:#808080;
+	font-size:17px;
+	margin:12px auto 8px;
+}
+.ticket-prompt-info p {
+	color:#999;
+	font-size:13px;
+	margin-bottom:4px;
+}
+
+/* 礼券记录 */
+.ticket-record-nav {
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	overflow:hidden;
+	margin-bottom:10px;
+	line-height:45px;
+	background:#fff;
+	z-index:999;
+	box-shadow:0 1px 2px rgba(0,0,0,.1);
+}
+.ticket-record-nav li {
+	float:left;
+	width:50%;
+	text-align:center;
+}
+.ticket-record-nav li:first-child {
+	border-right:1px solid #cecece;
+}
+.ticket-record-nav a:link, .ticket-record-nav a:visited {
+	display:block;
+	height:100%;
+	color:#333;
+	border-bottom:3px solid transparent;
+}
+.ticket-record-nav li.on a:link, .ticket-record-nav li.on a:visited {
+	color:#ec652a;
+	border-bottom:3px solid #ec652a;
+}
+/*礼券记录列表*/
+.ticket-record-list {
+	width:95%;
+	margin:55px auto 20px;
+}
+.ticket-record-list li {
+	position: relative;
+	margin-bottom:8px;
+	box-shadow:1px 1px 2px rgba(0,0,0,.1);
+}
+.ticket-record-list li img {
+	display:block;
+	width:100%;
+}
+.record-info {
+	position:absolute;
+	top:50%;
+	right:0;
+	width:24%;
+	color:#fff;
+	text-align:center;
+	-webkit-transform:translateY(-50%);
+	transform:translateY(-50%);
+}
+.record-info h4 {
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.no-ticket-record {
+	display:none;
+	position:relative;
+	color:#b2b2b2;
+	font-size:16px;
+	margin:120px 0 10px;
+	text-align:center;
+}
+.no-ticket-record::before {
+	display:block;
+	content:'';
+	width:95px;
+	height:50px;
+	margin:0 auto 5px;
+	background:url(./img/scactivation/icon-noticket.png) no-repeat;
+	background-size:100% auto;
+}
+.ticket-list-load {
+	bottom:auto;
+	margin-left:-43px;
+	margin-bottom:15px;
+	-webkit-transform:none;
+	transform:none;
+}
+.ticket-list-load span {
+	display:none;
+}

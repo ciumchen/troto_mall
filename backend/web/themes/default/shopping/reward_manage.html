@@ -1,0 +1,279 @@
+{php $newUI = true;}
+{template 'common/header'}
+
+<ol class="breadcrumb" style="padding:5px 0;">
+	<li><a href="{url 'home/welcome/ext'}"><i class="fa fa-cogs"></i> &nbsp; 微商城</a></li>
+	<li>商城功能</li>
+	<li>佣金提现审核</li>
+</ol>
+
+<ul class="nav nav-tabs">
+	<li {if $operation=='display'} class="active" {/if}>
+		<a href="{php echo url('shopping/reward/manage', array('m'=>'ewei_shopping'))}">佣金提现管理</a>
+	</li>
+	{if $applyid}
+	<li class="active">
+		<a href="{php echo url('shopping/reward/manage', array('op'=>'handle', 'm'=>'ewei_shopping'))}">修改佣金提现</a>
+	</li>
+	{/if}
+</ul>
+{if $operation=='display'}
+<div class="panel panel-info">
+	<div class="panel-heading">筛选</div>
+	<div class="panel-body">
+		<form action="./index.php" method="get" class="form-horizontal order-horizontal" role="form" id="form1">
+			<input type="hidden" name="c" value="shopping" />
+			<input type="hidden" name="a" value="reward" />
+			<input type="hidden" name="do" value="manage" />
+			<input type="hidden" name="m" value="ewei_shopping" />
+			<?php if(isset($_GPC['status'])){?>
+			<input type="hidden" name="status" value="<?php echo $_GPC['status'];?>" />
+			<?php }?>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">SN编号</label>
+				<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+					<input class="form-control" name="sn" id="" type="text" value="{$_GPC['sn']}" placeholder="可输入部分模糊查询">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">生成时间</label>
+				<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+					{php echo tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d', $list['param']['starttime']),'endtime'=>date('Y-m-d', $list['param']['endtime'])));}
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">当前状态</label>
+				<div class="col-sm-7 col-lg-9 col-xs-12">
+					<select class="form-control" style="margin-right:15px;width:100px;" name="status" >
+						<option value="10"{if $_GPC['status']=='10'||!$_GPC['status']} selected="selected"{/if}>10条</option>
+						<option value="20"{if $_GPC['status']=='20'} selected="selected"{/if}>20条</option>status
+						<option value="30"{if $_GPC['status']=='30'} selected="selected"{/if}>30条</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">单页数量</label>
+				<div class="col-sm-7 col-lg-9 col-xs-12">
+					<select class="form-control" style="margin-right:15px;width:100px;" name="psize" >
+						<option value="10"{if $_GPC['psize']=='10'||!$_GPC['psize']} selected="selected"{/if}>10条</option>
+						<option value="20"{if $_GPC['psize']=='20'} selected="selected"{/if}>20条</option>
+						<option value="30"{if $_GPC['psize']=='30'} selected="selected"{/if}>30条</option>
+						<option value="50"{if $_GPC['psize']=='50'} selected="selected"{/if}>50条</option>
+						<option value="100"{if $_GPC['psize']=='100'} selected="selected"{/if}>100条</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-3 col-lg-1">
+					<button class="btn btn-default">
+						<i class="fa fa-search"></i> 搜索
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	</div>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		佣金提现申请（当前搜索到 <label class="text text-danger">{$list['total']}</label> 条数据）
+	</div>
+	{php //echo pre($list)}
+	<div class="panel-body table-responsive" >
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th style="width:70px;">ID</th>
+					<th>SN编号</th>
+					<th style="width:170px;">申请人</th>
+					<th style="width:70px;">金额</th>
+					<th style="width:150px;">提现到</th>
+					<th>状态</th>
+					<th>申请创建时间</th>
+					<th>申请处理时间</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list['list'] $item}
+				<tr class="list" data-sid='{$item["topicid"]}' data-state='{$item["status"]}'>
+					<td>{$item['id']}</td>
+					<td>{$item['sn']}</td>
+					<td>{$item['uid']} - {$item['nickname']}</td>
+					<td>{$item['amount']}</td>
+					<td>{php echo $item['channel']=='bank'?'银行卡':'支付宝';}</td>
+					<td><span class="label label-info">{php echo getStatusTypeStr($item['status'])}</span></td>
+					<td>{php echo date('Y-m-d H:i:s', $item['create_time'])}</td>
+					<td>{php echo ($item['finish_time']>100000) ? date('Y-m-d H:i:s', $item['finish_time']) : ''}</td>
+					<td>
+						<a class="btn btn-info btn-sm" href="{php echo url('shopping/reward/manage',array('applyid'=>$item['id'], 'op'=>'handle'))}">编辑</a>
+						<a class="btn btn-info btn-sm" href="{php echo url('shopping/reward/detail',array('applyid'=>$item['id'], 'op'=>'handle'))}">详情</a>
+					</td>
+				{/loop}
+			</tbody>
+		</table>
+	</div>
+</div>
+{$list['pager']}
+
+{else if $operation == 'handle'}
+<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+	<div class="panel panel-default">
+		<div class="panel-heading">处理佣金提现申请</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">申请单号：</label>
+				<div class="col-sm-3 col-xs-3">
+					<input  class="form-control" name="sn" value="{$item['sn']}" readonly="readonly">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">提现金额：</label>
+				<div class="col-sm-2 col-xs-2">
+					<input  class="form-control" name="amount" value="{$item['amount']}" readonly="readonly">
+					<span class="help-block"><strong style="color:red">提示: </strong>必须是整数后者两位小数</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">申请用户：</label>
+				<div class="col-sm-3 col-xs-3">
+					<input  class="form-control" value="UID: {$item['brokerid']}, 昵称: {$item['user']}" readonly="readonly">
+					<a href="{php echo url('mc/member/credit',array('uid'=>$item['brokerid']))}" target="_blank">查看会员账户详情</a>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">提现信息：</label>
+				<div class="col-sm-5 col-xs-5">
+				<table class="table" style="background-color:#f5f5f5">
+					<tbody><tr>
+						<td colspan="12">
+						{if $item['channel']=='bank'}
+							<div class="form-group">
+								<label class="control-label">提现渠道</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;银行卡
+							</div>
+							<div class="form-group">
+								<label class="control-label">申请时间</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{php echo date('Y-m-d H:i:s', $item['create_time'])}
+							</div>
+							<div class="form-group">
+								<label class="control-label">提现金额</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$item['amount']}
+							</div>
+							<div class="form-group">
+								<label class="control-label">银行名称</label>&nbsp;&nbsp;&nbsp;&nbsp;{$item['bank_name']}
+							</div>
+							<div class="form-group">
+								<label class="control-label">账户名称</label>&nbsp;&nbsp;&nbsp;&nbsp;{$item['bank_account_name']}
+							</div>
+							<div class="form-group">
+								<label class="control-label">账户卡号</label>&nbsp;&nbsp;&nbsp;&nbsp;{$item['bank_account']}
+							</div>
+							<div class="form-group">
+								<label class="control-label">开户行名</label>&nbsp;&nbsp;&nbsp;&nbsp;{$item['bank_branch_name']}
+							</div>
+							<div class="form-group">
+								<label class="control-label">开户地区</label>&nbsp;&nbsp;&nbsp;&nbsp;{$item['bank_province']}&nbsp;{$item['bank_city']}
+							</div>
+						{/if}
+						{if $item['channel']=='alipay'}
+							<div class="form-group">
+								<label class="control-label">提现渠道</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;支付宝
+							</div>
+							<div class="form-group">
+								<label class="control-label">申请时间</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{php echo date('Y-m-d H:i:s', $item['create_time'])}
+							</div>
+							<div class="form-group">
+								<label class="control-label">提现金额</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$item['amount']}
+							</div>
+							<div class="form-group">
+								<label class="control-label">支付宝名称</label>&nbsp;&nbsp;&nbsp;&nbsp;{$item['alipay_name']}
+							</div>
+							<div class="form-group">
+								<label class="control-label">支付宝账户</label>&nbsp;&nbsp;&nbsp;&nbsp;{$item['alipay_account']}
+							</div>
+						{/if}
+						</td>
+					</tr>
+				</tbody>
+				</table>
+    			</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">当前状态</label>
+				<div class="col-sm-5 col-xs-5">
+					<input class="form-control" value="{php echo getStatusTypeStr($item['status'])}" readonly="readonly">
+				</div>
+			</div>
+			{if $item['status']<3 }
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">提现处理：</label>
+				<div class="col-sm-3 col-xs-3">
+					<select class="form-control" name="status">
+						<option value="3">完成打款</option>
+						<option value="1">审核通过</option>
+						<option value="2">审核不通过</option>
+					</select>
+    			</div>
+			</div>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">处理备注：</label>
+				<div class="col-sm-4 col-xs-4">
+					<textarea class="form-control" id="remark" name="remark" rows="2"></textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-7 col-xs-8">
+					<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+					<input type="hidden" name="token" value="{$_W['token']}" />
+    			</div>
+			</div>
+			{/if}
+		</div>
+	</div>
+</form>
+	<div class="panel panel-default">
+		<div class="panel-heading">处理佣金提现申请日志信息</div>
+		<div class="panel-body">
+			<table class="table table-hover">
+				<tbody><tr>
+					<td colspan="12">
+					{loop $item['remark'] $log}
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">{php echo date('Y-m-d H:i:s', $log['time'])}</label>
+							<div class="col-sm-9 col-xs-12">
+								<p class="form-control-static">操作员：{$log['operator']}（{$log['nickname']}），操作：{$log['operation']}{if $log['mark']}，操作备注信息：{$log['mark']}{/if}</p>
+							</div>
+						</div>
+					{/loop}
+					</td>
+				</tr>
+			</tbody></table>
+		</div>
+	</div>
+{/if}
+<script>
+$(function(){
+	var $fetchItem = $('.fetch-item');
+	 $fetchItem.on('change',function(){
+	 	var Item = $(this).children();
+	 	Item.each(function(){
+	 		if($(this).get(0).selected == true){	
+	 			var this_Id = $(this).val(),
+	 				fetchMobile = $('.fetch-mobile');
+	 			fetchMobile.each(function(){
+	 				var $this = $(this);
+	 				 if($this.attr('data-rol') == this_Id){
+			 				var fetchMobileTxt = $this.val();
+			 				$("#suppliers-mobile").show();
+			 				$this.parent('div').children(":first").val(fetchMobileTxt);
+			 		 }
+	 			})
+	 			if($(this).get(0).index === 0){
+	 					fetchMobile.parent('div').children(":first").val("");
+	 					$("#suppliers-mobile").hide();
+	 			}	
+	 		}
+	 		
+	 	})
+	 })
+})
+</script>
+
+{template 'common/footer'}

@@ -1,0 +1,924 @@
+{template 'common/header'}
+{template 'common'}
+{template 'operationsmenu'}
+<style>
+	.table>tbody>tr>td.spec-class{overflow: initial;}
+	.table>tbody>tr>td.spec-class>label.label-spec{margin: 5px;}
+</style>
+<div class="main">
+{if $operation == 'inserOrder' and $page=1}
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			用户信息
+		</div>
+		<?php if($userInfo && $uid):?>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-4 control-label">
+					<img onerror="this.src='http://w.ichibanv2.com/attachment/images/global/avatars/avatar_3.jpg'" src="{$userInfo['avatar']}" class="img-responsive img-thumbnail" width="120">
+					<p class="form-control-static"><a href="{php echo url('mc/member/post',array('uid'=>$userInfo['uid']))}">
+						目标用户：{$userInfo['nickname']}</a></p>
+					<p class="form-control-static">{php echo date('Y-m-d H:i:s',$userInfo['createtime'])}</p>
+					<p class="active"><a href="javascript:void(0);" class="btn btn-border">随机生成</a>
+					<a href="javascript:void(0);" class="btn btn-border border-margin btn-primary">正常生成</a>
+					</p>
+				</label>
+					<label class="col-sm-9 col-xs-12">
+						{php if($userInfo['parent']):}
+							<img onerror="this.src='http://w.ichibanv2.com/attachment/images/global/avatars/avatar_3.jpg'" src="{$userInfo['parent']['avatar']}" class="img-responsive img-thumbnail" width="120">
+							<p class="form-control-static">
+								<a href="{php echo url('mc/member/post',array('uid'=>$userInfo['parent']['uid']))}">用户上家：{$userInfo['parent']['nickname']}</a>
+							</p>
+							<p class="form-control-static">{php echo date('Y-m-d H:i:s',$userInfo['parent']['createtime'])}</p>
+						{php endif;}
+					</label>
+					<div class="clearfix"></div>
+					<div class="panel panel-info">
+					<div class="panel-heading">筛选</div>
+					<div class="panel-body">
+						<form action="" method="get" class="form-horizontal order-horizontal" role="form">
+							<input type="hidden" name="c" value="site"/>
+							<input type="hidden" name="a" value="entry"/>
+							<input type="hidden" name="do" value="operations"/>
+							<input type="hidden" name="m" value="ewei_shopping"/>
+							<input type="hidden" name="uid" value="{$uid}"/>
+							<input type="hidden" name="op" value="inserOrder"/>
+							<div class="col-sm-5">
+								<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品ID</label>
+								<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+									<input class="form-control" name="goodsid" type="text" placeholder="可查询商品ID" value="{$_GPC['goodsid']}"/>
+								</div>
+							</div>
+							<div class="col-sm-5">
+								<label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label">商品标题</label>
+								<div class="col-sm-8 col-lg-9 col-xs-12 order-col-xs-5">
+									<input class="form-control" name="title" type="text" placeholder="可查询商品标题" value="{$_GPC['title']}"/>
+									<p style="color:red">*多个标题用英文的 ”|“ 分隔，(例如：a|b|c) ，一次性只能搜索一次多个商品出来，请一次性写完搜索的标题</p>
+								</div>
+							</div>
+							<div class="col-sm-1">
+								<button type="submit" class="btn btn-default"><i class="fa fa-search"></i>搜索</button>
+							</div>
+						</form>
+					</div>
+				</div>
+					<form action="" method="post" enctype="multipart/form-data" onsubmit="return check_from()" id="commitGenrate">
+					<div class="order-auto-list" id="order-auto-sroll" style="text-align:center;">
+						<table class="table table-hover" id="each-table">
+							<thead class="navbar-inner">
+								<tr>
+									<th style="width:50px;">ID</th>
+									<th style="min-width:150px;">商品标题</th>
+									<th class="select-total" style="width:150px;">添加个数</th>
+									<th style="width:100px;">商品总库存</th>
+									<th>规格</th>
+									<th style="text-align:right; min-width:120px;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="tbody-loop" id="tbody-loop">
+								{loop $list $item}
+		
+								<tr>
+									{php $Spec = Goods_getGoodsSpec($item['id']);}
+
+									{php $specs = $Spec['specs']}
+									<td style="overflow:visible"><input type="checkbox" name="checkbox[]" class="small-change" value="{$item['id']}"/>{$item['id']}</td>
+									<td>{if !empty($category[$item['pcate']])}<span class="text-error">[{$category[$item['pcate']]['name']}] </span>{/if}{if !empty($children[$item['pcate']])}<span class="text-info">[{$children[$item['pcate']][$item['ccate']][1]}] </span>{/if}{$item['title']}</td>
+									<td><input type="text" class="form-control select-total-num" style="display:none;width:65px;text-align:center" data-max="{if $item['stock']==null}{$item['total']}{else}{$item['stock']}{/if}" name="select_total-{$item['id']}" value="1"/></td>
+									<td>
+										{if empty($item['options'])}{$item['total']}{else}{$item['optionsAllTotal']}{/if}
+									</td>
+									<td class="spec-class">
+										{loop $specs $ps}
+										{loop $ps['items'] $s}
+
+										{php if(!empty($s) && !empty($Spec)):}
+										<label class="label  label-default label-spec" style="visibility:hidden" datatre="{$s['id']}">{$s['title']}(库存: {$s['stock']})</label>
+										{php else:}
+										<label class="label  label-default label-spec"  datatre="{$s['id']}">没有规格！</label>
+										{php endif;}
+										{/loop}
+										{/loop}
+										<input type="hidden" name="Spec-vals-{$item['id']}" value=""/>
+									</td>
+									<td style="text-align:right;" id="spec-td">
+										<a href="javascript:;"  OnClick="each_spec(this)" id="spec_options" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="选择">选择规格</a>
+									</td>
+								</tr>
+								{/loop}
+							</tbody>
+						</table>
+						<span id="message-base"><h3></h3></span>
+					</div>
+					<a href="javascript:;" class="btn btn-primary col-lg-1 add-more-list">加载更多</a>
+
+						<!-- <div id="pager-max">{$pager}</div> -->
+			</div>
+		</div>
+		<!------   详细信息start ------>
+   <div class="panel panel-default max-hidden"  style="display:none">
+		<div class="panel-heading">
+			基本信息
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">用户UID</label>
+				<div class="col-sm-9 col-xs-12" style="margin-bottom:10px">
+					<input type="text" class="form-control" name="" value="{$uid}" readonly="readonly">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">备注</label>
+				<div class="col-sm-9 col-xs-12" style="margin-bottom:10px">
+					<input type="text" id='remark' name="for-remark" class="form-control" value="" />
+				</div>
+			</div>
+		</div>
+	  </div>
+	  <!---- 收货地址start ---->
+	 <div class="panel panel-default max-hidden" style="display:none">
+	   <div class="panel-heading">
+			收货地址
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">详细地址</label>
+				<div class="col-sm-9 col-xs-12"  style="margin-bottom:10px">
+					<select name="select-address" class="form-control input-medium" id="address_select" onchange="Cg_Select(this)">
+						<option>---请选择---</option>
+						<option value="default">选择地址</option>
+						<option value="auto">自行填写地址</option>
+					</select>
+				</div>
+			</div>
+			<!----------  默认收货地址框start -------->
+		{if !empty($result_address)}
+
+		{loop $result_address $address}
+		<div class="address_true" style="display:none;border:1px dotted #ddd">
+			<div class="panel-body" style="padding-top:0px">
+
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">姓名：</label>
+						<div class="col-sm-9 col-xs-12" id="realname-address">
+							{$address['realname']}
+						</div>
+					</div>
+			</div>
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">手机：</label>
+						<div class="col-sm-9 col-xs-12">
+							{$address['mobile']}
+						</div>
+					</div>
+			</div>
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">地址：</label>
+						<div class="col-sm-9 col-xs-12">
+							{$address['province']}{$address['city']}{$address['area']}{$address['address']}
+						</div>
+						{if $address['isdefault'] == 1}
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">默认地址</label>
+						{/if}
+					</div>
+					<input type="radio" name="radio_info" value="{$address['id']}" {if $address['isdefault'] == 1} checked {/if}/>
+			</div>
+		</div>
+		{/loop}
+		{else}
+		<div class="address_true_none" style="display:none;text-align:center;border:1px dotted #ddd" cety='none'>
+			<h3>当前没有默认地址</h3>
+		</div>
+		{/if}
+			<!----------  默认收货地址框end -------->
+			<!----------  自行修改收货地址框start ---------->
+			<div class="address_true_2" style="display:none;border:1px dotted #ddd">
+
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<div class="panel-heading" style="color:#333">收货 地址</div>
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">姓名：</label>
+						<div class="col-sm-9 col-xs-12">
+							<input type="text" class="form-control" name="auto_realname"/>
+						</div>
+					</div>
+			</div>
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">手机：</label>
+						<div class="col-sm-9 col-xs-12">
+							<input type="text" class="form-control" name="auto_real_mobile"/>
+						</div>
+					</div>
+			</div>
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">地址：</label>
+						<div class="col-sm-9 col-xs-12">
+							{php echo tpl_fans_form('reside',array('province' => $profile['resideprovince'],'city' => $profile['residecity'],'district' => $profile['residedist']));}
+						</div>
+					</div>
+			</div>
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">详细地址：</label>
+						<div class="col-sm-9 col-xs-12">
+							<input type="text" class="form-control" name="auto_real_address"/>
+						</div>
+					</div>
+			</div>
+		</div>
+		<!-------- 自行修改收货地址框end -------->
+		   </div>
+		</div>
+	<!---- 收货地址end ---->
+	<!--------- 详细信息end -------->
+	   <div class="panel-body" id="panel-body_3">
+			<div class="form-group">
+				<input type="button"  value="填写详细信息" class="btn btn-primary col-lg-1" />
+			</div>
+		</div>
+		<div class="panel-body"id="panel-body_2" style="display:none" >
+			<div class="form-group">
+				<input type="hidden" name="c" value="site" />
+				<input type="hidden" name="a" value="entry" />
+				<input type="hidden" name="m" value="ewei_shopping" />
+				<input type="hidden" name="do" value="operations" />
+				<input type="hidden" name="op" value="inserOrder" />
+				<input name="uid" value="{$uid}" type="hidden">
+				<input name="page" value="{$page}" type="hidden">
+				<input type="hidden" name="normal" value="normal"/>
+				<input type="submit" name="submit" value="提交" id="btn_check" class="btn btn-primary col-lg-1" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+		</form>
+		<div class="panel-body" style="display:none" id="panel-body_1">
+			<div class="form-group">
+				<form action="" id="insert-order" method="post" class="form-horizontal form" enctype="multipart/form-data" id="form1">
+					<input type="hidden" name="c" value="site" />
+					<input type="hidden" name="a" value="entry" />
+					<input type="hidden" name="m" value="ewei_shopping" />
+					<input type="hidden" name="do" value="operations" />
+					<input type="hidden" name="op" value="inserOrder" />
+					<input name="uid" value="{$uid}" type="hidden">
+					<input name="page" value="{$page}" type="hidden">
+					<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+					<input type="hidden" name="token" value="{$_W['token']}" />
+				</form>
+			</div>
+		</div>
+		<?php else:?>
+		<div class="panel-body">
+			<div class="form-group">
+				当前没有账户信息！
+				<a href="{php echo url('mc/huiyuan');}">去会员运营看看</a>
+			</div>
+		</div>
+		<?php endif;?>
+	</div>
+
+{elseif $operation == 'inserOrder'}
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			用户信息
+		</div>
+		<?php if($userInfo && $uid):?>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">
+					<img onerror="this.src='http://w.ichibanv2.com/attachment/images/global/avatars/avatar_3.jpg'" src="{$userInfo['avatar']}" class="img-responsive img-thumbnail" width="120">
+					<p class="form-control-static"><a href="{php echo url('mc/member/post',array('uid'=>$userInfo['uid']))}">
+						目标用户：{$userInfo['nickname']}</a></p>
+					<p class="form-control-static">{php echo date('Y-m-d H:i:s',$userInfo['createtime'])}</p>
+					<p class="active"><a href="javascript:void(0);" class="btn btn-border">随机生成</a>
+					<a href="javascript:void(0);" class="btn btn-border border-margin btn-primary">正常生成</a>
+					</p>
+				</label>
+					<label class="col-sm-9 col-xs-12">
+						{php if($userInfo['parent']):}
+							<img onerror="this.src='http://w.ichibanv2.com/attachment/images/global/avatars/avatar_3.jpg'" src="{$userInfo['parent']['avatar']}" class="img-responsive img-thumbnail" width="120">
+							<p class="form-control-static">
+								<a href="{php echo url('mc/member/post',array('uid'=>$userInfo['parent']['uid']))}">用户上家：{$userInfo['parent']['nickname']}</a>
+							</p>
+							<p class="form-control-static">{php echo date('Y-m-d H:i:s',$userInfo['parent']['createtime'])}</p>
+						{php endif;}
+					</label>
+					<form action="" method="post" enctype="multipart/form-data" onsubmit="return check_from()" id="commitGenrate">
+						<table class="table table-hover" id="each-table">
+							<thead class="navbar-inner">
+								<tr>
+									<th style="width:50px;">ID</th>
+									<th style="min-width:150px;">商品标题</th>
+									<th class="select-total" style="width:150px;">添加个数</th>
+									<th style="width:100px;">商品库存</th>
+									<th style="width:150px;">状态</th>
+									<th>规格</th>
+									<th style="text-align:right; min-width:120px;">操作</th>
+								</tr>
+							</thead>
+							<tbody class="tbody-loop order-list-con" id="tbody-loop">
+								{loop $list $item}
+								<tr>
+									<td><input type="checkbox" name="checkbox[]" class="small-change" value="{$item['id']}"/>{$item['id']}</td>
+									<td>{if !empty($category[$item['pcate']])}<span class="text-error">[{$category[$item['pcate']]['name']}] </span>{/if}{if !empty($children[$item['pcate']])}<span class="text-info">[{$children[$item['pcate']][$item['ccate']][1]}] </span>{/if}{$item['title']}</td>
+									<td><input type="text" class="form-control select-total-num" style="display:none;width:65px;text-align:center" data-max="{$item['total']}" name="select_total-{$item['id']}" value=""/></td>
+									<td>
+										{if empty($item['stock'])}
+											{$item['total']}
+										{else}
+											{$item['stock']}
+										{/if}
+									</td>
+									<td>
+										<label data='{$item['status']}' class='label  label-default {if $item['status']==1}label-info{/if}'>{if $item['status']==1}上架{else}下架{/if}</label>
+										<label data='{$item['type']}' class='label  label-default {if $item['type']==1}label-info{/if}' >{if $item['type']==1}实物{else}虚物{/if}</label>
+									</td>
+									{php $Spec = Goods_getGoodsSpec($item['id']);}
+
+									<td class="spec-class">
+										{php for($i=0;$i<count($Spec);$i++):}
+										{php if(!empty($Spec['options'][$i]['title'])):}
+										<label class="label  label-default label-spec" style="visibility:hidden" datatre="{$Spec['options'][$i]['id']}">{$Spec['options'][$i]['title']}</label>
+										{php endif;}
+										{php endfor;}
+										<input type="hidden" name="Spec-vals-{$item['id']}" value=""/>
+									</td>
+									<td style="text-align:right;" id="spec-td">
+									{if $item['total']==0 || $item['status']!=1}
+										<a href="javascript:void(0);"  class="btn btn-default btn-sm no-total-border" >库存不够</a>
+									{else}
+										<a href="javascript:;"  OnClick="each_spec(this)" id="spec_options" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="选择">选择规格</a>
+									{/if}
+									</td>
+								</tr>
+								{/loop}
+							</tbody>
+						</table>
+			</div>
+		</div>
+		<!------   详细信息start ------>
+   <div class="panel panel-default max-hidden"  style="display:none">
+		<div class="panel-heading">
+			基本信息
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">用户UID</label>
+				<div class="col-sm-9 col-xs-12" style="margin-bottom:10px">
+					<input type="text" class="form-control" name="" value="{$uid}" readonly="readonly">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">备注</label>
+				<div class="col-sm-9 col-xs-12" style="margin-bottom:10px">
+					<input type="text" id='remark' name="for-remark" class="form-control" value="" />
+				</div>
+			</div>
+		</div>
+	  </div>
+	  <!---- 收货地址start ---->
+	 <div class="panel panel-default max-hidden" style="display:none">
+	   <div class="panel-heading">
+			收货地址
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 control-label">详细地址</label>
+				<div class="col-sm-9 col-xs-12"  style="margin-bottom:10px">
+					<select name="select-address" class="form-control input-medium" id="address_select" onchange="Cg_Select(this)">
+						<option>---请选择---</option>
+						<option value="default">选择默认地址</option>
+						<option value="auto">自行填写地址</option>
+					</select>
+				</div>
+			</div>
+			<!----------  默认收货地址框start -------->
+		{if !empty($result_address)}
+		<div class="address_true" style="display:none;border:1px dotted #ddd">
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<div class="panel-heading" style="color:#333">收货 地址</div>
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">姓名：</label>
+						<div class="col-sm-9 col-xs-12" id="realname-address">
+							{$result_address['realname']}
+						</div>
+					</div>
+			</div>
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">手机：</label>
+						<div class="col-sm-9 col-xs-12">
+							{$result_address['mobile']}
+						</div>
+					</div>
+			</div>
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">地址：</label>
+						<div class="col-sm-9 col-xs-12">
+							{$default_address}
+						</div>
+					</div>
+			</div>
+		</div>
+		{else}
+		<div class="address_true_none" style="display:none;text-align:center;border:1px dotted #ddd" cety='none'>
+			<h3>当前没有默认地址</h3>
+		</div>
+		{/if}
+			<!----------  默认收货地址框end -------->
+			<!----------  自行修改收货地址框start ---------->
+			<div class="address_true_2" style="display:none;border:1px dotted #ddd">
+
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<div class="panel-heading" style="color:#333">收货 地址</div>
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">姓名：</label>
+						<div class="col-sm-9 col-xs-12">
+							<input type="text" class="form-control" name="auto_realname"/>
+						</div>
+					</div>
+			</div>
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">手机：</label>
+						<div class="col-sm-9 col-xs-12">
+							<input type="text" class="form-control" name="auto_real_mobile"/>
+						</div>
+					</div>
+			</div>
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">地址：</label>
+						<div class="col-sm-9 col-xs-12">
+							{php echo tpl_fans_form('reside',array('province' => $profile['resideprovince'],'city' => $profile['residecity'],'district' => $profile['residedist']));}
+						</div>
+					</div>
+			</div>
+			<div class="panel-body" style="padding-top:0px">
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">详细地址：</label>
+						<div class="col-sm-9 col-xs-12">
+							<input type="text" class="form-control" name="auto_real_address"/>
+						</div>
+					</div>
+			</div>
+		</div>
+		<!-------- 自行修改收货地址框end -------->
+		   </div>
+		</div>
+	<!---- 收货地址end ---->
+	<!--------- 详细信息end -------->
+	   <div class="panel-body" id="panel-body_3">
+			<div class="form-group">
+				<input type="button"  value="填写详细信息" class="btn btn-primary col-lg-1" />
+			</div>
+		</div>
+		<div class="panel-body"id="panel-body_2" style="display:none" >
+			<div class="form-group">
+				<input type="hidden" name="c" value="site" />
+				<input type="hidden" name="a" value="entry" />
+				<input type="hidden" name="m" value="ewei_shopping" />
+				<input type="hidden" name="do" value="operations" />
+				<input type="hidden" name="op" value="inserOrder" />
+				<input name="uid" value="{$uid}" type="hidden">
+				<input name="page" value="{$page}" type="hidden">
+				<input type="hidden" name="normal" value="normal"/>
+				<input type="submit" name="submit" value="提交" id="btn_check" class="btn btn-primary col-lg-1" />
+				<input type="hidden" name="token" value="{$_W['token']}" />
+			</div>
+		</div>
+		</form>
+		<div class="panel-body" style="display:none" id="panel-body_1">
+			<div class="form-group">
+				<form action="" id="insert-order" method="post" class="form-horizontal form" enctype="multipart/form-data" id="form1">
+					<input type="hidden" name="c" value="site" />
+					<input type="hidden" name="a" value="entry" />
+					<input type="hidden" name="m" value="ewei_shopping" />
+					<input type="hidden" name="do" value="operations" />
+					<input type="hidden" name="op" value="inserOrder" />
+					<input name="uid" value="{$uid}" type="hidden">
+					<input name="page" value="{$page}" type="hidden">
+					<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+					<input type="hidden" name="token" value="{$_W['token']}" />
+				</form>
+			</div>
+		</div>
+		<?php else:?>
+		<div class="panel-body">
+			<div class="form-group">
+				当前没有账户信息！
+				<a href="{php echo url('mc/huiyuan');}">去会员运营看看</a>
+			</div>
+		</div>
+		<?php endif;?>
+	</div>
+
+{elseif $operation == 'signinGoods'}
+	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" id="form1">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				签到赠送
+			</div>
+			<div class="panel-body">
+				{if !empty($parentid)}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">上级分类</label>
+					<div class="col-sm-9 col-xs-12 control-label" style="text-align:left;">{$parent['name']}</div>
+				</div>
+				{/if}
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="displayorder" class="form-control" value="{$category['displayorder']}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>分类名称</label>
+					<div class="col-sm-9 col-xs-12">
+						<input type="text" name="catename" class="form-control" value="{$category['name']}" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">分类图片</label>
+					<div class="col-sm-9 col-xs-12">
+						{php echo tpl_form_field_image('thumb', $category['thumb'])}
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">分类描述</label>
+					<div class="col-sm-9 col-xs-12">
+						<textarea name="description" class="form-control" cols="70">{$category['description']}</textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">首页推荐</label>
+					<div class="col-sm-9 col-xs-12">
+						 <label class='radio-inline'>
+							 <input type='radio' name='isrecommand' value=1' {if $category['isrecommand']==1}checked{/if} /> 是
+						 </label>
+						 <label class='radio-inline'>
+							 <input type='radio' name='isrecommand' value=0' {if $category['isrecommand']==0}checked{/if} /> 否
+						 </label>
+					</div>
+				</div>
+
+				 <div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">是否显示</label>
+					<div class="col-sm-9 col-xs-12">
+						<label class='radio-inline'>
+							<input type='radio' name='enabled' value='1' {if $category['enabled']==1}checked{/if} /> 是
+						</label>
+						<label class='radio-inline'>
+							<input type='radio' name='enabled' value='0' {if $category['enabled']==0}checked{/if} /> 否
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group col-sm-12">
+			<input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
+			<input type="hidden" name="token" value="{$_W['token']}" />
+		</div>
+	</form>
+{else}
+<div class="clearfix welcome-container">
+	<div class="page-header">
+		<h4><i class="fa fa-android"></i>&nbsp;订单统计情况</h4>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-body table-responsive">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>付款订单总额(元)</th>
+						<th>今日付款订单总额(元)</th>
+						<th>昨日付款订单总额(元)</th>
+						<th>一周内付款订单总额(元)</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>{if $WholeSumTotal}{$WholeSumTotal}{else}0{/if}</td>
+						<td>{if $todaySumTotal}{$todaySumTotal}{else}0{/if}</td>
+						<td>{if $yestodaySumTotal}{$yestodaySumTotal}{else}0{/if}</td>
+						<td>{if $aWeekSumTotal}{$aWeekSumTotal}{else}0{/if}</td>
+					</tr>
+					<tr>
+						<td colspan="4">
+							<a href="javascript:;" style="float:left" class="btn btn-default" id="btn-slide">展开搜索</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="slide-time" style="display:none">
+				<div style="float:left">
+					{php echo tpl_form_field_daterange('time', array('starttime'=>date('Y-m-d', $starttime),'endtime'=>date('Y-m-d', $endtime)));}
+				</div>
+				<div class="col-sm-3 col-lg-2">
+					<button  class="btn btn-default" id="btn-time-ready"><i class="fa fa-search"></i>搜索</button>
+				</div>
+			</div>
+			<div class="clearfix"></div>
+			<div class="page-header append-header" style="display:none">
+				<strong>搜索结果</strong>
+			</div>
+			<div></div>
+		</div>
+	</div>
+</div>
+{/if}
+</div>
+<script>
+	var $select = $('.select-total'),
+		$num = $('.select-total-num'),
+		$slide = $('#btn-slide'),
+		$$searchTime = $('#btn-time-ready');
+	$(document).on('click', '.small-change', function() {
+		var $this = $(this);
+		if ($this.is(':checked')) {
+			$this.parents('tr').find('.select-total-num').show();
+		} else {
+			$this.parents('tr').find('.select-total-num').val('').hide();
+		}
+	});
+
+	$$searchTime.on('click',function(){
+		var data,url
+			toggleElm = $('.daterange').parent("div");
+
+		data = {time: [{starttime:toggleElm.find("input:first").val(),endtime:toggleElm.find("input:eq(1)").val()}],type: 'search'}
+		url = location.href;
+		$.ajax({
+			type:'post',
+			url: url,
+			data: data,
+			dataType: 'json',
+			success:function(data){
+				if(data.status == 200){
+					if(data.dataTotal > 0){
+						var XHtml = "<table class='table table-double'>\
+							<thead><tr><th>搜索结果订单总额(元)</th><th>搜索结果订单总数(个)</th></tr></thead>\
+							<tbody><tr><td>"+data.dataTotal+"</td><td>"+data.sumTotal+"</td>\
+							</tr>\
+							</tbody>\
+						</table>\
+						";
+						$(".append-header").next('div').html(XHtml).css("display","none").slideDown('slow');
+						$(".append-header").slideDown("slow");
+					}
+				} else {	
+					alert(data.msc);
+				}
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        console.debug(XMLHttpRequest.status);
+                        console.error(XMLHttpRequest.readyState);
+                        console.warn(textStatus);
+             }
+		})
+	});
+	/*function forBodyNum() {
+		var flag = true;
+		$('.tbody-loop tr').each(function() {
+			if ($(this).find('.small-change').is(':checked')) {
+				flag = false;
+				return false;
+			}
+		});
+		return flag;
+	}*/
+	var flag= false
+	$slide.click(function(){
+		if(!flag){
+			$(".slide-time").slideDown("slow");
+			$('.append-header').slideDown("slow").next("div").slideDown("slow");
+			$(this).text('收起搜索')
+			flag = true
+		} else {
+			$(".slide-time").slideUp("slow");
+			$('.append-header').slideUp("slow").next("div").slideUp("slow");
+			$(this).text('展开搜索')
+			flag = false;
+		}
+	});
+
+	$num.on('keyup', function(e) {
+		if (e.keyCode != 8) {
+			var $this = $(this);
+			$this.val($this.val().replace(/[^0-9]/g,''));
+			if (parseInt($this.val()) > parseInt($this.attr('data-max'))) {
+				$this.val($this.attr('data-max'));
+			}
+		}
+	});
+
+	/*function smallChange(eve){
+		console.log(eve);
+		if(eve.checked){
+			eve.parent('tr').find('.select-total-num').show();
+		} else {
+			eve.parent('tr').find('.select-total-num').hide();
+		}
+	}*/
+
+	function check_from(){
+  		var _ischecked = $("#each-table input[type='checkbox']");
+  		if(_ischecked.is(":checked")){
+  			var flag = false;
+  			$num.each(function() {
+  				var $this = $(this);
+  				if ($this.parents('tr').find('.small-change').is(':checked')) {
+		  			if ($.trim($this.val()) == '') {
+		  				alert('请输入个数！');
+		  				$this.focus();
+		  				$("html,body").animate({scrollTop:500},1000);
+		  				flag = true;
+		  				return false;
+		  			}
+  				}
+  			});
+  			if (flag) {
+  				return false;
+  			}
+  			var address_true = $(".address_true_none")
+  			if(address_true.attr("cety")=="none"){
+  				alert("当前没有默认地址！请手动添加！");
+  				$("#address_select").focus();
+  				return false;
+  			}
+
+  			return true
+  		}else{
+  			alert("请选择商品！");
+  			$("html,body").animate({scrollTop:200},1000);
+  			return false
+  		}
+
+
+  	   return false
+}
+
+
+	function Cg_Select(elem){
+		var $this = $(elem)
+		var $address = $this.parent().parent().next(".address_true_none");
+		if($this.get(0).selectedIndex=='1'){
+			$(".address_true_none").fadeIn(1000);
+			$(".address_true").fadeIn(1000)
+			$(".address_true_2").fadeOut("slow")
+		}
+		if($address.attr("cety")==''){
+			$address.removeAttr("cety");
+		}else{
+			$address.attr("cety","none");
+		}
+		if($this.get(0).selectedIndex=='2'){
+			$(".address_true_2").fadeIn(1000)
+			$(".address_true").fadeOut("slow")
+			$(".address_true_none").fadeOut("slow").removeAttr("cety")
+		}
+	}
+	var _adsfade = function(booleans,elem){
+		if(!booleans){
+			elem.fadeIn("slow");
+		}else{
+			elem.fadeIn(1000);
+		}
+	}
+	function each_spec(elem){
+		var $this = $(elem)
+		var _labelcheck = $this.parent().prev().children()
+		_labelcheck.css("visibility","visible");
+		_labelcheck.bind("click",function(){
+				$(this).each(function(){
+				$(this).css("background","#B15E5E").siblings().css("background-color","#777")
+				var datas = $(this).attr("datatre");
+				//$(this).next("input").val(datas)
+				$(this).nextAll("input[type=hidden]").val(datas);
+
+			})
+		})
+	}
+
+	require(['bootstrap'],function($){
+		$('.btn').hover(function(){
+			$(this).tooltip('show');
+		},function(){
+			$(this).tooltip('hide');
+		});
+
+		$("p.active > a").each(function(){
+			var th = $(this);
+			th.click(function(){
+				th.addClass("btn-primary");
+				th.siblings().removeClass("btn-primary")
+				if(th.index() == '1'){
+					$("#panel-body_1").hide()
+					$("#panel-body_3").show()
+					$("#insert-order").attr("datas","do");
+					$(".order-auto-list").attr("id","order-auto-sroll")
+					$(".add-more-list").fadeIn("slow");
+					$("#each-table").fadeIn("slow");
+					$("#pager-max").fadeIn("slow");
+					$("#message-base").show();
+					$("#commitGenrate").show();
+					$('.panel-info').show();
+				}else{
+					$("#panel-body_1").show()
+					$("#panel-body_3").hide()
+					$("#insert-order").removeAttr("datas");
+					$(".order-auto-list").removeAttr("id")
+					$(".add-more-list").fadeOut("slow");
+					$("#each-table").fadeOut("slow");
+					$("#pager-max").fadeOut("slow");
+					$(".max-hidden").fadeOut("slow");
+					$("#panel-body_2").hide()
+					$("#message-base").hide()
+					$("#commitGenrate").hide();
+					$('.panel-info').hide();
+				}
+			})
+		})
+
+		$("#panel-body_3").click(function(){
+			$("div[class='panel panel-default max-hidden']").fadeIn("slow");
+			$(this).hide();
+			$("#panel-body_2").show();
+		})
+		var _getTrLeng = function(){
+			return $("#tbody-loop > tr").length;
+		}
+		!function() {
+			var $list = $('#tbody-loop'),
+				$addBtn = $('.add-more-list'),
+				page = 1,
+				flag = true,
+				url = "{php echo url('site/entry',array('do'=>'GetListGoods','m'=>'ewei_shopping','op'=>'inserOrder'))}"
+			$addBtn.on('click', function() {
+				var $this = $(this);
+				$this.text("加载中。。");
+
+				page++;
+				$.ajax({
+					type: 'GET',
+					url: url,
+					data: {page: page,len: _getTrLeng()},
+					dataType: 'json',
+					success: function(data) {
+					//console.log(data)
+						if (data.length > 0) {
+							var strHTML = '';
+							for (var i=0,len=data.length; i<len; i++) {
+								var d = data[i];
+								var spec = '';
+								var title = '';
+								var allTotal = '';
+								var	spec = '<a href="javascript:;"  onclick="each_spec(this)" id="spec_options" class="btn btn-default btn-sm" data-toggle="tooltip" data-placement="top" title="选择">选择规格</a>';
+
+								if (d.specs.length > 0) {
+									for (var j=0,jLen=d.specs.length; j<jLen; j++) {
+										var o = d.specs[j],
+											k = d.options[j];
+										title += '<label class="label label-default label-spec" style="visibility:hidden" datatre="'+o.id+'">'+o.title+'(库存: '+k.stock+')</label>\
+										<input type="hidden" name="Spec-vals-'+o.id+'" value=""/>\
+										';
+									}
+								}
+								strHTML += '<tr>\
+									<td><input type="checkbox" name="checkbox[]" class="small-change" value="'+d.id+'"/>'+d.id+'</td>\
+									<td>'+d.title+'</td>\
+									<td><input type="text" class="form-control select-total-num" style="display:none;width:65px;text-align:center" data-max="'+d.total+'" name="select_total-'+d.id+'" value=""/></td>\
+									<td>'+d.optionsAllTotal+'</td>\
+									<td class="spec-class">\
+										'+title+'\
+									</td>\
+									<td style="text-align:right;" id="spec-td">'+spec+'</td>\
+								</tr>';
+							}
+
+						}else{
+							$("#message-base h3").text("没有商品了！");
+						}
+						$list.append(strHTML);
+						$addBtn.text("加载更多").removeAttr("flag");
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+			                  console.debug(XMLHttpRequest.status);
+			                  console.error(XMLHttpRequest.readyState);
+			                  console.warn(textStatus);
+			            }
+				});
+			});
+		}();
+
+
+	});
+</script>
+{template 'common/footer'}

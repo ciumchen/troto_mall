@@ -1,0 +1,38 @@
+{template 'common/header-gw'}
+<ol class="breadcrumb">
+	<li><a href="./?refresh"><i class="fa fa-home"></i></a></li>
+	<li class=""><a href="{url 'user/display'}">系统</a></li>
+	<li class="active">查看用户权限</li>
+</ol>
+<ul class="nav nav-tabs">
+	<li><a href="{php echo url('user/display');}">用户列表</a></li>
+	<li><a href="{php echo url('user/create');}">添加用户</a></li>
+	<li><a href="{url 'user/edit' array('uid' => $uid)}">编辑用户</a></li>
+	<li class="active"><a href="{php echo url('user/permission', array('uid' => $uid));}">查看用户权限</a></li>
+</ul>
+
+<div class="clearfix">
+	<div class="form form-horizontal" >
+		<h5 class="page-header">用户组基本权限</h5>
+		<?php foreach ($_W['adminpower'] as $key => $value):?>
+		<?php if($key & $power):?>
+			<div class="form-group">
+				<label class="col-xs-12 col-sm-3 col-md-2 col-lg-2 control-label">拥有权限：</label>
+				<div class="col-sm-9">
+					<p class="form-control-static">{$value}</p>
+				</div>
+			</div>
+		<?php endif;?>
+		<?php endforeach;?>
+		
+		
+		
+		
+		<div class="form-group">
+			<div class="col-xs-12 col-sm-10 col-md-10 col-lg-10">
+				<a class="btn btn-primary" href="{url 'user/edit' array('uid' => $uid)}">编辑当前用户资料</a>
+			</div>
+		</div>
+	</div>
+</div>
+{template 'common/footer-gw'}

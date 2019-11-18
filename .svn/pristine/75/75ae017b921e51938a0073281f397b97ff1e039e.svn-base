@@ -1,0 +1,250 @@
+{php $newUI = true;}
+{template 'common/header'}
+
+<ol class="breadcrumb" style="padding:5px 0;">
+	<li><a href="{url 'home/welcome/ext'}"><i class="fa fa-cogs"></i> &nbsp; {$module_types}</a></li>
+	<li><a href="{url 'home/welcome/ext' array('m' => $module['name'])}">{$module}</a></li>
+	<li class="active">{$ptr_title}</li>
+</ol>
+<!-- <ul class="nav nav-tabs">
+	<li {if $type  == 'month'} class="active" {/if}>
+		<a href="{php echo url('mc/finance/'.$do, array('type'=>$_GPC['type'],'op'=>'month','status'=>$_GPC['status']))}">每月统计</a></li>
+	<li {if $type  == 'week'} class="active"{/if}>
+		<a href="{php echo url('mc/finance/'.$do, array('type'=>$_GPC['type'],'op'=>'week','status'=>$_GPC['status']))}">每周统计</a></li>
+	<li {if $type  == 'day'} class="active" {/if}>
+		<a href="{php echo url('mc/finance/'.$do, array('type'=>$_GPC['type'],'op'=>'day','status'=>$_GPC['status']))}">每日统计</a></li>
+</ul> -->
+{if $do == 'exchange'}
+<ul class="nav nav-tabs">
+	<li {if empty($status)} class="active" {/if}>
+		<a href="{php echo url('ma/manager/exchange', array('status'=>'0'))}">未审核</a></li>
+	<li {if $status  == '1'} class="active"{/if}>
+		<a href="{php echo url('ma/manager/exchange', array('status'=>'1'))}">审核中</a></li>
+	<li {if $status  == '2'} class="active"{/if}>
+		<a href="{php echo url('ma/manager/exchange', array('status'=>'2'))}">完成</a></li>
+</ul>
+<p class="lead">注:&nbsp;&nbsp;<span class="text-danger">佣金兑换为手动兑换,当前页面功能用于记录和查询</span> <a class="btn btn-success" href="{php echo url('ma/manager/exchangedownload')}">用户提现excel</a></p>
+<div class="panel panel-default">
+	<div class="panel-body table-responsive" >
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th width=40>ID</th>
+					<th width=100>开户人</th>
+					<th width=120>联系电话</th>
+					<th width=250>银行信息</th>
+					<th width=250>日志备注</th>
+					<th>申请状态</th>
+					<th width=150>申请时间</th>
+					<th width=150>完成时间</th>
+				</tr>
+			</thead>
+			<tbody>
+				{loop $list $item}
+				<tr class="list" data-fid='{$item["rechangeid"]}' data-state='{$item["fstatus"]}'>
+					<td>{$item['rechangeid']}</td>
+					<td>
+						<!-- <a href="{php echo url('ma/manager/incomelog', array('userid'=>$item['uid']));}"> -->
+						{$item['fusername']}
+						<!-- </a> -->
+					</td>
+					<td>{$item['fmobile']}</td>
+					<td>{$item['fbanklocation']}&nbsp;{$item['fbankname']}<br>银行卡{$item['fbankaccount']}</td>
+					<td>{$item['fdesc']}</td>
+					<td >
+						{if $item['fstatus'] == '-1'}
+						<span class="btn btn-warning">审核失败</span>
+						{/if}
+						{if $item['fstatus'] == '0'}
+						<span class="btn btn-danger checkexchange">可审核</span>
+						<span class="btn btn-warning Noexchange">异常禁用</span>
+						{/if}
+						{if $item['fstatus'] == '1'}
+						<span class="btn btn-warning checkexchange">审核中</span>
+						{else if $item['fstatus'] == '2'}
+						<span class="text-success">已审核</span>
+						{/if}
+					</td>
+					<td>{$item['fcreatetime']}</td>
+					<td>{$item['fcompletiontime']}</td>
+				{/loop}
+			</tbody>
+		</table>
+	</div>
+</div>
+{$pager}
+<div id="modal-confirmsend" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="width:600px;margin:0px auto;">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+				<h3>佣金信息审核</h3>
+			</div>
+			<div class="modal-body">
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-xs-10 col-sm-3 col-md-3 control-label">审核备注</label>
+						<div class="col-xs-12 col-sm-9 col-md-8 col-lg-8">
+							<textarea class="form-control" rows="3" name="desc"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-primary true" name="confirmsend" value="yes">确认兑换</button>
+				<a href="#" class="btn btn-default" data-dismiss="modal" aria-hidden="true">关闭</a>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(function(){
+		$('.checkexchange').click(function(){
+			var _modal = $('#modal-confirmsend'), _this = $(this), _parents = _this.closest('tr.list'),
+			_id = _parents.attr('data-fid'),
+			_state = _parents.attr('data-state');
+			if(_state == 1 || _state == 0){
+				_modal.modal('show');
+				_modal.find('button.true').click(function(){
+					var _desc = _modal.find('.modal-body textarea[name="desc"]').val();
+					if(_desc == ''){
+						alert('备注不能为空')
+						_modal.modal('hide')
+					}else{
+						$.post("{php echo url('ma/manager/checkexchange')}",{desc:_desc,id:_id,state:_state},function(msg){
+							if(msg == 1){
+								window.location = "{php echo url('ma/manager/exchange',array('op'=>'yes'))}"	
+							}else{
+								alert('信息不存在')
+							}
+							
+						})
+					}
+				});	
+			}
+		});
+		$('.Noexchange').click(function(){
+			var _this = $(this), _parents = _this.closest('tr.list'),
+			_id = _parents.attr('data-fid');
+			$.post("{php echo url('ma/manager/noexchange')}",{id:_id,state:-1},function(msg){
+				location.reload();
+			})
+
+		})
+	})
+</script>
+{else if $do == 'incomelog'}
+<ul class="nav nav-tabs">
+	<li {if $type  == 'display'} class="active" {/if}>
+		<a href="{php echo url('ma/manager/incomelog', array('op'=>'display','userid'=>$userid,'nickname'=>$ptr_title))}">记录日志</a></li>
+	<li {if $type  == 'order'} class="active"{/if}>
+		<a href="{php echo url('ma/manager/incomelog', array('op'=>'order','userid'=>$userid,'nickname'=>$ptr_title))}">订单日志</a></li>
+</ul>
+{if $type == 'display'}
+<div class="panel panel-default">
+	<div class="panel-body table-responsive" >
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th width=100>UID</th>
+					<th width=80>昵称</th>
+					<th width=80>几级收入</th>
+					<th width=190>下级ID</th>
+					<th width=100>收入金额</th>
+					<th>日志时间</th>
+				</tr>
+			</thead>
+			<tbody>
+				{php $totalprice=0;}
+				{loop $list $item}
+				<tr class="list" data-fid='{$item["fid"]}'>
+					<td>{$item['pid']}</td>
+					<td>{$ptr_title}</td>
+					<td>{$item['level']} 级</td>
+					<td>{$item['nickname']}</td>
+					<td>{$item['fmoney']}</td>
+					<td>{$item['ftime']}</td>
+					{php $totalprice+=$item['fmoney'];}
+				{/loop}
+			</tbody>
+		</table>
+		<table class="table table-hover">
+			<tr>
+				<td>
+					<span class="help-block">{$ptr_title} 收入 共：<span class="text-danger"><b>{$totalprice}<b/></span> 元</span>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+{$pager}
+{else}
+<a class="btn btn-success" href="{php echo url('ma/manager/incomelog', array('op'=>$type,'userid'=>$userid,'nickname'=>$ptr_title,'status'=>1))}">已付款</a>
+<a class="btn btn-danger" href="{php echo url('ma/manager/incomelog', array('op'=>$type,'userid'=>$userid,'nickname'=>$ptr_title,'status'=>0))}">未付款</a>
+<a class="btn btn-warning" href="{php echo url('ma/manager/incomelog', array('op'=>$type,'userid'=>$userid,'nickname'=>$ptr_title,'status'=>-1))}">取消</a>
+<a class="btn btn-danger" href="{php echo url('ma/manager/incomelog', array('op'=>$type,'userid'=>$userid,'nickname'=>$ptr_title,'status'=>-2))}">退货</a>
+<br><br>
+注：<p class="text-warning">取消的订单，若带有微信单号，即为已付款</p>
+
+<div class="panel panel-default">
+	<div class="panel-body table-responsive" >
+		<table class="table table-hover">
+			<thead class="navbar-inner">
+				<tr>
+					<th width=100>东家UID</th>
+					<th width=180>东家昵称</th>
+					<th width=80>几级收入</th>
+					<th width=100>下级ID</th>
+					<th width=190>下级昵称</th>
+					<th width=90>付款金额</th>
+					<th width=100>佣金提成</th>
+					<th width=100>订单状态</th>
+					<th width=100>是否退货</th>
+					<th width=190>微信单号</th>
+					<th>日志时间</th>
+				</tr>
+			</thead>
+			<tbody>{php $totalprice = 0;}
+				{loop $orderComm $items}
+				{loop $items $item}
+				<tr class="list">
+					<td>{$userid}</td>
+					<td>{$ptr_title}</td>
+					<td>{$item['level']} 级</td>
+					<td>{$item['uid']}</td>
+					<td>{$item['nickname']}</td>
+					<td>{$item['price']}</td>
+					<td>{$item['money']}{php $totalprice+=$item['money'];}</td>
+					<td>{if $item['status'] >= 1}
+							<span class="text-success"><b>订单付款<b/></span>
+						{else}
+							<span class="text-danger"><b>订单取消<b/></span>
+						{/if}
+					</td>
+					<td>{if $item['cancelgoods'] == 0}
+							<span class="text-success"><b>无退货<b/></span>
+						{else if $item['cancelgoods'] == 1 && $item['status'] == -2}
+							<span class="text-success"><b>已退货<b/></span>
+						{/if}
+					</td>
+					<td>{$item['transid']}</td>
+				{/loop}
+				{/loop}
+			</tbody>
+		</table>
+		<table class="table table-hover">
+			<tr>
+				<td>
+					<span class="help-block">{$ptr_title} 当前 共：<span class="text-danger"><b>{$totalprice}<b/></span> 元</span>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+{/if}
+{/if}
+
+
+
+
+{template 'common/footer'}
